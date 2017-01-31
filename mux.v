@@ -7,5 +7,4 @@ module mux(sel, in0, in1, out);
     output   out;
     
     assign out = ((!sel & in0) | (sel & in1));
-
 endmodule
