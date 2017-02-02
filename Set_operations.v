@@ -36,7 +36,7 @@ endmodule
 //SLT
 
 module slt(cout, set);
-    input coutl
+    input cout;
     output reg[31:0] set;
     always @(cout)
 
