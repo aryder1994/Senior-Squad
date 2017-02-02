@@ -6,7 +6,7 @@ module ALU_tb;
 			wire   [31:0] out,logical_32_out,sll_out,srl_sra_out,mux_0_out;
 		
 	
-	alu_logical_32 alu_logical(
+	alu_logical alu_logical_0(
 			.in1(in1),
 			.in2(in2),
 			.sel0(sel0),
