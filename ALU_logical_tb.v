@@ -3,7 +3,7 @@
 module ALU_tb;
 			reg    [31:0] in1,in2;
 			reg           sel0,sel1,sel2;
-			wire   [31:0] out,logical_32_out,sll_out,srl_sra_out,mux_0_out;
+			wire   [31:0] out;
 		
 	
 	alu_logical alu_logical_0(
@@ -11,17 +11,13 @@ module ALU_tb;
 			.in2(in2),
 			.sel0(sel0),
 			.sel1(sel1),
-			.out(out),
-			.logical_32_out(logical_32_out),
-			.sll_out(sll_out),
-			.srl_sra_out(srl_sra_out),
-			.mux_0_out(mux_0_out)			
+			.sel2(sel2),
+			.out(out)			
 			);
 			 
 			initial
 			begin
-			$monitor("in1 = %b,in2 = %b,sel0 = %b,sel1 = %b,out = %b,logical_32_out = %b,sll_out = %b,srl_sra_out = %b, mux_0_out = %b"
-			,in1, in2, sel0, sel1, out, logical_32_out, sll_out, srl_sra_out, mux_0_out);
+			$monitor("in1 = %b,in2 = %b,sel0 = %b,sel1 = %b,sel2 = %b,out = %b",in1, in2, sel0, sel1, sel2, out);
 
 			#0 in1= 32'b00000000000000000000000000000001; in2= 32'b00000000000000000000000000000001; sel2= 1'b0; sel1= 1'b0; sel0= 1'b0; //AND
 			#1 in1= 32'b00000000000000000000000000000001; in2= 32'b00000000000000000000000000000001; sel2= 1'b0; sel1= 1'b0; sel0= 1'b1; //OR
