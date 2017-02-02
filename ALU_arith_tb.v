@@ -9,7 +9,7 @@ module ALU_tb;
 			wire   [31:0] diff, seq_out, sne_out, slt_out, sgt_out, sle_out, sge_out, logical_32_out, mux_0_out, mux_1_out, mux_2_out, mux_3_out, mux_4_out;
 		
 	
-	alu_arith alu(
+	alu_arith alu_0(
 			.in1(in1),
 			.in2(in2),
 			.crtlSig(crtlSig),
