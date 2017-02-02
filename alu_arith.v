@@ -17,10 +17,10 @@
 
 
 
-module alu_arith(in1, in2, ctrlSig, out);
+module alu_arith(in1, in2, sel0, sel1, sel2, sel3, sel4, out);
     input    [31:0] in1;
     input    [31:0] in2;
-    input    [3:0]  ctrlSig;
+    input           sel0, sel1, sel2, sel3, sel4;
     output   [31:0] out;
     wire     [31:0] sum;
     wire            adder_out;
