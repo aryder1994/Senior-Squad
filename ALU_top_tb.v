@@ -41,8 +41,8 @@ assign shift3[31:5] = 27'b000000000000000000000000000;
 #5  in1=$random; in2=shift3; sel0=1'b1; sel1=1'b0; sel2=1'b1; sel3=1'b0; sel4=1'b0; sel5=1'b0; //SRL
 #6  in1=$random; in2=$random; sel0=1'b0; sel1=1'b0; sel2=1'b0; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SEQ
 #7  in1=$random; in2=$random; sel0=1'b1; sel1=1'b0; sel2=1'b0; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SNE
-#8  in1=32'b00000000000000000000000000000000; in2=32'b00000000000000000000000000000001; sel0=1'b0; sel1=1'b1; sel2=1'b0; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SLT
-#9  in1=32'b00000000000000000000000000000001; in2=32'b00000000000000000000000000000000; sel0=1'b1; sel1=1'b1; sel2=1'b0; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SGT
+#8  in1=$random; in2=$random; sel0=1'b0; sel1=1'b1; sel2=1'b0; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SLT
+#9  in1=$random; in2=$random; sel0=1'b1; sel1=1'b1; sel2=1'b0; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SGT
 #10 in1=$random; in2=$random; sel0=1'b0; sel1=1'b0; sel2=1'b1; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SLE
 #11 in1=$random; in2=$random; sel0=1'b0; sel1=1'b1; sel2=1'b1; sel3=1'b0; sel4=1'b1; sel5=1'b1; //SGE
 #12 in1=$random; in2=$random; sel0=1'b0; sel1=1'b0; sel2=1'b0; sel3=1'b1; sel4=1'b1; sel5=1'b1; //SUB
