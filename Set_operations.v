@@ -3,98 +3,65 @@
 
 //SEQ
 
-module seq(out, set);
-    input out;
-    output reg [31:0] set;
-    always @(out)
-    
-    begin
-        if(out == 1'b0)
-            set = 32'b1;
-        else
-            set = 32'b0;
-    end
+module seq(is_not_zero, out);
+    input is_not_zero;
+    output [31:0] out;
+    assign out[0] = !is_not_zero;
+    assign out[31:1] = 31'b0000000000000000000000000000000;
 endmodule
 
 
 //SNE
 
-module sne(out, set);
-    input out;
-    output reg [31:0] set;
-    always @(out)
-    
-    begin
-        if(out == 32'b0)
-            set = 32'b0;
-        else
-            set = 32'b1;
-    end
+module sne(is_not_zero, out);
+    input is_not_zero;
+    output [31:0] out;
+    assign out[0] = is_not_zero;
+    assign out[31:1] = 31'b0000000000000000000000000000000;
 endmodule
 
 
 //SLT
 
-module slt(cout, set);
-    input cout;
-    output reg[31:0] set;
-    always @(cout)
-
-    begin
-        if(cout == 1'b0)
-            set = 32'b1;
-        else
-            set =32'b0;
-        end
+module slt(a_msb, b_msb, diff_msb, out);
+    input a_msb, b_msb, diff_msb;
+    output [31:0] out;
+    
+    assign out[0] = ((a_msb ^ b_msb) & a_msb) | (!(a_msb ^ b_msb) & diff_msb);
+    assign out[31:1] = 31'b0000000000000000000000000000000;
 endmodule
 
 
 //SGT
 
-module sgt(out, cout, set);
-    input out;
-    input cout;
-    output reg[31:0] set;
-    always @(out or cout)
-    begin
-        if(cout == 1'b0 || out == 1'b0)
-            set = 32'b0;
-        else
-            set = 32'b1;
-    end
+module sgt(a_msb, b_msb, diff_msb, is_not_zero, out);
+    input a_msb, b_msb, diff_msb, is_not_zero;
+    output [31:0] out;
+	
+	  assign out[0] = ((a_msb ^ b_msb) & b_msb) | (!(a_msb ^ b_msb) & !diff_msb & is_not_zero);
+    assign out[31:1] = 31'b0000000000000000000000000000000;
 endmodule
 
 
 //SLE
 
-module sle(out, cout,set);
-	input  out;
-	input cout;
-	output reg [31:0] set;
-
-	always @(out or cout)
-	begin
-		if(cout == 1'b0 || out == 1'b0)
-			set = 32'b1;
-		else
-			set = 32'b0;
-	end
+module sle(sgt, out);
+	input  sgt;
+	output [31:0] out;
+    
+    assign out[0] = !sgt;
+    assign out[31:1] = 31'b0000000000000000000000000000000;
 endmodule
 
 
 //SGE
 
-module sge(cout, set);
-    input cout;
-    output reg[31:0] set;
-    always @(cout)
-
-    begin
-        if(cout == 1'b0)
-            set = 32'b0;
-        else
-            set = 32'b1;
-        end
+module sge(slt, out);
+    input slt;
+    output [31:0] out;
+    
+    assign out[0] = !slt;
+    assign out[31:1] = 31'b0000000000000000000000000000000;
 endmodule
 
 
