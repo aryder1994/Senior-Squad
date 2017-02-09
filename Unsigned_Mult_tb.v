@@ -2,7 +2,7 @@
 
 module Unsigned_Mult_tb;
 	reg	[31:0] in1,in2;
-	wire[64:0] out;
+	wire	[63:0] out;
 	
 
 	multiplier mult_0(
