@@ -21,7 +21,7 @@ module multiplier_adder(a,b,sel0,sel1,out);
    wire    [31:0] b_new;
    wire    [31:0] c_in;
    wire    [31:0] sum;
-   wire    [31:0] overflow;
+   wire    overflow;
 
    assign b_temp = ~b;   
 
