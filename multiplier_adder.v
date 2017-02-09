@@ -13,10 +13,9 @@
 module multiplier_adder(a,b,sel0,sel1,out);
    input   [31:0] a, b;
    input          sel0, sel1;
-   output  [31:0] out;
+   output  [31:0] out;   
    
    
-   wire	   [30:0] c;
    wire           cout;
    wire    [31:0] b_temp;
    wire    [31:0] b_new;
