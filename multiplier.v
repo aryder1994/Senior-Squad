@@ -5,14 +5,19 @@ module multiplier(in1, in2, out);
     input    [31:0] in2;
     output   [63:0] out;
 
+    wire [31:0] ones;
+    wire [31:0] zeros;
+    wire [31:0] shifted_temp_out_init;
     wire [31:0] temp_out_top [31:0];
     wire [64:0] temp_out [31:0];
     wire [64:0] shifted_temp_out [32:0];
-    wire [32:0] sel0;
-    wire [32:0] sel1;
+    wire [31:0] sel0;
+    wire [31:0] sel1;
 
+    assign zeros = 32'b00000000000000000000000000000000;
+    
     assign shifted_temp_out[0][32:1] = in1;
-    assign shifted_temp_out[0][64:33] = 32'b00000000000000000000000000000000;
+    assign shifted_temp_out[0][64:33] = zeros;
     assign shifted_temp_out[0][0] = 1'b0;
 
     genvar i;
