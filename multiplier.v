@@ -19,8 +19,8 @@ module multiplier(in1, in2, out);
     generate
     for (i = 0; i < 32; i=i+1)
     begin
-        assign sel0[i] = shifted_temp_out[i][1];
-        assign sel1[i] = !(shifted_temp_out[i][0] ^ shifted_temp_out[i][1]);
+        assign sel0[i] = shifted_temp_out[i][0];
+        assign sel1[i] = shifted_temp_out[i][0] ^ shifted_temp_out[i][1];
         multiplier_adder ADD_SUB_N(shifted_temp_out[i][64:33], in2, sel0[i], sel1[i], temp_out_top[i]);
         assign temp_out[i][32:0] = shifted_temp_out[i][32:0];
         assign temp_out[i][64:33] = temp_out_top[i];
