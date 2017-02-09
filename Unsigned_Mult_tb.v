@@ -18,12 +18,12 @@ begin
 $monitor("in1 = %b,in2 = %b,out = %b", in1, in2, out);
 
 
-#0  in1= $random; in2=$random;
-#1  in1= $random; in2=$random;
-#2  in1= $random; in2=$random;
-#3  in1= $random; in2=$random;
-#4  in1= $random; in2=$random;
-#5  in1= $random; in2=$random;
+#0  in1= $urandom; in2=$urandom;
+#1  in1= $urandom; in2=$urandom;
+#2  in1= $urandom; in2=$urandom;
+#3  in1= $urandom; in2=$urandom;
+#4  in1= $urandom; in2=$urandom;
+#5  in1= $urandom; in2=$urandom;
 end
 
 endmodule
