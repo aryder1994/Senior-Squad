@@ -28,7 +28,7 @@ module multiplier_adder(a,b,sel0,sel1,out);
 
    mux_32 MUX_ADD_OR_SUBTRACT (sel0, b_temp, b, b_new);
 
-   adder_32 ADDER0 (a, b_new, sel0, sum, cout, overflow);
+   adder_32 ADDER0 (a, b_new, ~sel0, sum, cout, overflow);
    
    mux_32 MUX_OUTPUT (sel1, a, sum, out);
 
