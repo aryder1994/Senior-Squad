@@ -8,11 +8,11 @@ module multiplier_shifter(in, out);
      generate
      for (i = 0; i < 64; i=i+1)
      begin
-        out[i] = in[i+1];
+        assign out[i] = in[i+1];
      end
      endgenerate
 
-     out[64] = in[64];
+     assign out[64] = in[64];
 endmodule
 
 
