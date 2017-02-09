@@ -5,8 +5,9 @@ module multiplier(in1, in2, out);
     input    [31:0] in2;
     output   [63:0] out;
 
-    wire [32:0] temp_out [64:0];
-    wire [33:0] shifted_temp_out [64:0];
+    wire [31:0] temp_out_top [32:0];
+    wire [64:0] temp_out [32:0];
+    wire [64:0] shifted_temp_out [33:0];
     wire [32:0] sel0;
     wire [32:0] sel1;
 
@@ -20,8 +21,9 @@ module multiplier(in1, in2, out);
     begin
         assign sel0[i] = shifted_temp_out[i][1];
         assign sel1[i] = !(shifted_temp_out[i][0] ^ shifted_temp_out[i][1]);
-        multiplier_adder ADD_SUB_N(shifted_temp_out[i][64:33], in2, sel0[i], sel1[i], temp_out[i][64:33]);
+        multiplier_adder ADD_SUB_N(shifted_temp_out[i][64:33], in2, sel0[i], sel1[i], temp_out_top[i]);
         assign temp_out[i][32:0] = shifted_temp_out[i][32:0];
+        assign temp_out[i][64:33] = temp_out_top[i];
         multiplier_shifter SHIFT_N(temp_out[i][64:0], shifted_temp_out[i+1][64:0]);
     end
     endgenerate
