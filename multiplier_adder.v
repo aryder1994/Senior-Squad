@@ -1,40 +1,46 @@
+//Adder & Subtractor for multiplier
+
+
+// Control Signals
+//      sel0    sel1
+//ADD   1       x
+//SUB   0       x
+//OUT   x       1
+//in1   x       0
+
+
+
 module multiplier_adder(a,b,sel0,sel1,out);
    input   [31:0] a, b;
-   input          selo0, sel1;
+   input          sel0, sel1;
    output  [31:0] out;
    
    
    wire	   [30:0] c;
    wire           cout;
    wire    [31:0] b_temp;
+   wire    [31:0] b_new;
+   wire    [31:0] c_in;
+   wire    [31:0] sum;
+
+   b_temp = ~b + 1;
+   c_in[0] = sel0;
 
 
-   always @(a or b or sel0 or sel1)
+   mux_32 MUX_ADD_OR_SUBTRACT (sel0, b_temp, b, b_new);
 
-   begin
-
-        if (sel1 == 1)                       //if sel1 == 1, out = a +/- b
-            begin
-                genvar i;
-            
-                begin
-                    if (sel0 == 0)                   //if sel0 == 0, it's subtraction
-                        b_temp = ~b + 1;             //set input b to two's compliment
-                end
-
-                adder ADDER0(a[0], b[0], sel0, out[0], c[0]);
+   genvar i;
+   adder ADDER0(a[0], b_new[0], sel0, sum[0], c[0]);
                 
-                generate
-                for (i = 1; i < 31; i=i+1)
-                begin
-                        adder ADDERn(a[i], b[i], sel0[i-1], out[i], c[i]);
-                end
-                endgenerate
+   generate
+   for (i = 1; i < 31; i=i+1)
+   begin
+           adder ADDERn(a[i], b_new[i], cin[i-1], sum[i], c[i]);
+   end
+   endgenerate
 
-                adder ADDER31(a[31], b[31], sel0[30], out[31], cout);
-            end
-        else                                 //if sel1 == 0, out = a
-            out = a;            
-    end
+   adder ADDER31(a[31], b_new[31], cin[30], sum[31], cout);
+
+   mux_32 MUX_OUTPUT (sel1, a, sum, out);
 
 endmodule
