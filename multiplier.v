@@ -14,9 +14,9 @@ module multiplier(in1, in2, out);
     assign shifted_temp_out[0][64:33] = 32'b00000000000000000000000000000000;
     assign shifted_temp_out[0][0] = 1'b0;
 
-    genvar i
-    generate;
-    for (i=0; i<=32; i=i+1)
+    genvar i;
+    generate
+    for (i = 0; i <= 32; i=i+1)
     begin
         assign sel0[i] = shifted_temp_out[i][1];
         assign sel1[i] = !(shifted_temp_out[i][0] ^ shifted_temp_out[i][1]);
@@ -25,5 +25,5 @@ module multiplier(in1, in2, out);
         multiplier_shifter SHIFT_N(temp_out[i][64:0], shifted_temp_out[i+1][64:0]);
     end
     endgenerate
-    assign out = shifted_temp_out[33];
+    assign out = shifted_temp_out[33][64:1];
 endmodule
