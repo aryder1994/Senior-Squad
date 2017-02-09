@@ -2,7 +2,7 @@
 
 module Unsigned_Mult_tb;
 	reg	[31:0] in1,in2;
-	reg 	clk;
+	reg 	clk,reset;
 	wire	[63:0] out;
 	
 
@@ -10,6 +10,7 @@ module Unsigned_Mult_tb;
 		.in1(in1),
 		.in2(in2),
 		.clk(clk),
+		.reset(reset),
 		.out(out)
 		);
 
@@ -17,7 +18,7 @@ module Unsigned_Mult_tb;
 initial
 begin
 
-	$monitor("in1 = %b,in2 = %b,out = %b", in1, in2, clk, out);
+	$monitor("in1 = %b,in2 = %b,out = %b", in1, in2, clk, reset, out);
 
 
 #0  in1= $random; in2=$random;
