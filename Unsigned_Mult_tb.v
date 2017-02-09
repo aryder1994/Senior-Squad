@@ -5,7 +5,7 @@ module Unsigned_Mult_tb;
 	wire	[63:0] out;
 	
 
-	multiplier mult_0(
+	umultiplier mult_0(
 		.in1(in1),
 		.in2(in2),
 		.out(out)
