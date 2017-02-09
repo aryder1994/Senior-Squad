@@ -1,4 +1,4 @@
-// Unsigned Multiplier
+// signed Multiplier
 
 module multiplier(in1, in2, out);
     input    [31:0] in1;

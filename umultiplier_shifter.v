@@ -1,18 +1,18 @@
 module umultiplier_shifter(in, out);
-     input   [66:0] in;
-     output  [66:0] out;
+     input   [68:0] in;
+     output  [68:0] out;
 
 
      genvar i;
 
      generate
-     for (i = 0; i < 66; i=i+1)
+     for (i = 0; i < 68; i=i+1)
      begin
         assign out[i] = in[i+1];
      end
      endgenerate
 
-     assign out[66] = in[66];
+     assign out[68] = in[68];
 endmodule
 
 
