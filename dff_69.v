@@ -1,6 +1,6 @@
 // D Flip Flop
 
-module dff(clk, d, q);
+module dff_69(clk, d, q);
     input    clk;
     input    [68:0] d;
     output   [68:0] q;

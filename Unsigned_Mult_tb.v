@@ -2,13 +2,12 @@
 
 module Unsigned_Mult_tb;
 	reg	[31:0] in1,in2;
-	reg 	clk,reset;
+	reg 	clk;
 	wire	[63:0] out;
 	
 
 	umultiplier mult_0(
 		.clk(clk),
-		.reset(reset),
 		.in1(in1),
 		.in2(in2),
 		.out(out)
@@ -30,8 +29,7 @@ begin
 #6 clk = 1;
 #7 clk = 0;
 #8 clk = 1;
-#9 reset = 0;
-#10 reset = 1;
+#9 clk = 0;
 
 #11 in1= $random; in2=$random;
 #12 clk = 0;
@@ -42,8 +40,7 @@ begin
 #17 clk = 1;
 #18 clk = 0;
 #19 clk = 1;
-#20 reset = 0;
-#21 reset = 1;
+#20 clk = 0;
 
 #22 in1= $random; in2=$random;
 #23 clk = 0;
@@ -54,8 +51,7 @@ begin
 #28 clk = 1;
 #29 clk = 0;
 #30 clk = 1;
-#31 reset = 0;
-#32 reset = 1;
+#31 clk = 0;
 
 #33 in1= $random; in2=$random;
 #34 clk = 0;
@@ -66,8 +62,7 @@ begin
 #39 clk = 1;
 #40 clk = 0;
 #41 clk = 1;
-#42 reset = 0;
-#43 reset = 1;
+#42 clk = 0;
 
 #44 in1= $random; in2=$random;
 #45 clk = 0;
@@ -78,8 +73,7 @@ begin
 #50 clk = 1;
 #51 clk = 0;
 #52 clk = 1;
-#53 reset = 0;
-#54 reset = 1;
+#53 clk = 0;
 
 #55 in1= $random; in2=$random;
 #56 clk = 0;
@@ -90,8 +84,7 @@ begin
 #61 clk = 1;
 #62 clk = 0;
 #63 clk = 1;
-#64 reset = 0;
-#65 reset = 1;
+#64 clk = 0;
 
 end
 
