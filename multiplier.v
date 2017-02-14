@@ -1,6 +1,6 @@
 // signed Multiplier
 
-module multiplier(in1, in2, out);
+module multiplier(clk, in1, in2, out);
     input           clk;
     input           reset;
     input    [31:0] in1;
@@ -23,9 +23,9 @@ module multiplier(in1, in2, out);
 
     assign zeros = 32'b00000000000000000000000000000000;
     
-    assign shifted_temp_out[0][32:1] = in1;
-    assign shifted_temp_out[0][64:33] = zeros;
-    assign shifted_temp_out[0][0] = 1'b0;
+    assign shifted_temp_out_d[0][32:1] = in1;
+    assign shifted_temp_out_d[0][64:33] = zeros;
+    assign shifted_temp_out_d[0][0] = 1'b0;
     
     dff_65 DFF0(clk, shifted_temp_out_d[0], shifted_temp_out_q[0]);
 		dff_65 DFF8(clk, shifted_temp_out_d[8], shifted_temp_out_q[8]);
