@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module Unsigned_Mult_tb;
+module Signed_Mult_tb;
 	reg	[31:0] in1,in2;
 	wire[64:0] out;
 	
