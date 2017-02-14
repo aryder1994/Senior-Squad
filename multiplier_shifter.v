@@ -1,6 +1,6 @@
-module umultiplier_shifter(in, out);
-     input   [68:0] in;
-     output  [68:0] out;
+module multiplier_shifter(in, out);
+     input   [64:0] in;
+     output  [64:0] out;
 
 
      //genvar i;
@@ -12,9 +12,9 @@ module umultiplier_shifter(in, out);
      //end
      //endgenerate
 
-     assign out[67:0] = in[68:1];
+     assign out[63:0] = in[64:1];
 
-     assign out[68] = in[68];
+     assign out[64] = in[64];
 endmodule
 
 
