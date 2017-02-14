@@ -8,7 +8,7 @@ module umultiplier(clk, in1, in2, out);
     input    [31:0] in2;
     output   [63:0] out;
 
-    wire [34:0] zeros;
+    wire [35:0] zeros;
     wire [33:0] extended_in2;
     wire [33:0] shifted_temp_out_init;
     wire [33:0] temp_out_top [33:0];
