@@ -7,7 +7,7 @@ module datapath(
 		dataSize,
 		pcPlus4,
 		zFlag, nzFlag,
-		extendedImm,
+		extendedImmOut,
 		registerS1Out);
 		
 		input           clk;
@@ -24,7 +24,7 @@ module datapath(
     
     wire     [31:0] busA, busB, busW, aluA, preAluB, preAluB2, aluB, aluResult, memData, zeros, unflippedMemDataUnsigned;
     reg      [31:0] memDataSigned, memDataUnsigned, flippedAluResult, flippedBusB;
-    wire      [4:0] rW;
+    wire      [4:0] rW, preRW;
     wire            preZFlag;
     wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
     wire      [1:0] flippedDataSize;
@@ -34,7 +34,7 @@ module datapath(
 		assign extendedImmOut = extendedImm;
 		assign registerS1Out = busA;
     
-    Reg_file REGISTERS(rS1, rS2, rW, busW, busA, busB, regWr, clk);
+    register_file REGISTERS(clk, regWr, rS1, rS2, rW, busW, busA, busB);
     
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
@@ -90,9 +90,9 @@ module datapath(
     assign nzFlag = !preZFlag;
     
     assign shiftValue[31:5] = 27'b000000000000000000000000000;
-    assign shiftValue[4:0] = prealuB[4:0];
+    assign shiftValue[4:0] = preAluB[4:0];
     
-    always @(memDataRaw) begin
+    always @(memDataUnsigned) begin
   	    case (dataSize)
   	        2'b11: begin
   	            memDataSigned <= memDataUnsigned;

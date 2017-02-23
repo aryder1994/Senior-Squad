@@ -1,27 +1,17 @@
-module register(dataIn, dataOut, regWr, clk);
-  
-  input [31:0] dataIn;
-  input regWr, clk;
-  
+module register(clk, regWr, dataIn, dataOut);
+  input clk, regWr;
+  input [31:0] dataIn; 
   output[31:0] dataOut;
   reg dataOut;  
   		
-		  always@(posedge clk, dataIn, regWr)			
-			
-			
-				if(regWr == 1 &&  clk)
+		  always@(posedge clk)			
+				if(regWr == 1)
 				begin	
-				
-					dataOut = dataIn;
+					dataOut <= dataIn;
 				end
-				
+
 				else
 				begin
-				
-					dataOut = dataOut;
-				
+					dataOut <= dataOut;
 				end
-			
-	      
-
 endmodule

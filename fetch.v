@@ -45,7 +45,7 @@ module fetch(clk, pcSelect, startAddress, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpR
     
     mux_32 START(pcSelect, preCurrentAddress, startAddress, currentAddress);
     
-    register PC(nextAddress, preCurrentAddress, 1'b1, clk);
+    register PC(clk, 1'b1, nextAddress, preCurrentAddress);
     
     adder_32 ADDER_1(currentAddress, four, 1'b0, pcPlus4, cout, overflow);
     

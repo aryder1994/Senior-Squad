@@ -13,7 +13,10 @@ TARGET = dff_64.v dff_65.v mux.v mux_32.v 1bit\ Adder.v 32bit\ Adder.v multiplie
 #TARGET = mux.v mux_32.v memory.v register.v or_32_input.v 1bit\ Adder.v 32bit\ Adder.v fetch.v
 
 #Datapath
-TARGET = mux.v mux_32.v or_32_input.v ALU_logical_1_bit.v ALU_logical_32.v sll_32.v srl_sra_32.v ALU_logical.v 1bit\ Adder.v 32bit\ Adder.v Set_operations.v alu_arith.v alu.v ALU_top_tb.v register.v Reg_file.v extender.v memory.v datapath.v
+#TARGET = mux.v mux_32.v or_32_input.v ALU_logical_1_bit.v ALU_logical_32.v sll_32.v srl_sra_32.v ALU_logical.v 1bit\ Adder.v 32bit\ Adder.v Set_operations.v alu_arith.v alu.v ALU_top_tb.v register.v Reg_file.v extender.v memory.v datapath.v
+
+#Single Cycle Processor
+TARGET = mux.v mux_5.v mux_32.v or_32_input.v ALU_logical_1_bit.v ALU_logical_32.v sll_32.v srl_sra_32.v ALU_logical.v 1bit\ Adder.v 32bit\ Adder.v Set_operations.v alu_arith.v alu.v ALU_top_tb.v register.v register_file.v extender.v memory.v datapath.v fetch.v control_signal.v
 
 
 .PHONY: all $(TARGET) clean
