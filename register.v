@@ -3,13 +3,13 @@ module register(dataIn, dataOut, regWr, clk);
   input [31:0] dataIn;
   input regWr, clk;
   
-  output[31:0] dataOut
+  output[31:0] dataOut;
   reg dataOut;  
   		
-		  always@(clk, dataIn, regWr)			
-			begin
+		  always@(posedge clk, dataIn, regWr)			
 			
-				if(posedge clk & regWr == 1)
+			
+				if(regWr == 1 &&  clk)
 				begin	
 				
 					dataOut = dataIn;
@@ -18,10 +18,10 @@ module register(dataIn, dataOut, regWr, clk);
 				else
 				begin
 				
-					dataOut;
+					dataOut = dataOut;
 				
 				end
-			end
+			
 	      
 
 endmodule
