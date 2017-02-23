@@ -107,5 +107,9 @@ module datapath(
   	end
   	
   	mux_32 MEM_SIGNED(memSign, memDataUnsigned, memDataSigned, memData);
+  	
+  	initial begin
+  	    $readmemh("data.hex", DATA_MEM.mem)
+  	end
 end module
     

@@ -65,4 +65,8 @@ module fetch(clk, pcSelect, address, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, v
     
     mux_32 NEXT_INSTRUCTION(jump, preNextAddressA, preNextAddressB, nextAddress);
     
+    initial begin
+        $readmemh("instr.hex", INST_MEMORY);
+    end
+    
 endmodule
