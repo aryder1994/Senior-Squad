@@ -3,40 +3,81 @@ module datapath(
 		clk,
 		rS1, rS2, rD,
 		imm16,
-		regDst, aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign,
+		regDst, aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign, loadHigh, link,
 		dataSize,
+		pcPlus4,
 		zFlag, nzFlag,
-		extendedImm);
+		extendedImm,
+		registerS1Out);
 		
 		input           clk;
 		input     [4:0] rS1, rS2, rD;
 		input    [15:0] imm16;
 		input           regDst, aluSrc;
 		input           alu0, alu1, alu2, alu3, alu4, alu5;
-		input           memWr, wSrc, regWr, memSign;
+		input           memWr, wSrc, regWr, memSign, loadHigh, link;
 		input     [1:0] dataSize;
+		input    [31:0] pcPlus4;
 		output          zFlag, nzFlag;
     output   [31:0] extendedImmOut;
+    output   [31:0] registerS1Out;
     
-    wire     [31:0] busA, busB, busW, aluA, prealuB, aluB, aluResult, memDataUnsigned, memData;
-    reg      [31:0] memDataSigned;
+    wire     [31:0] busA, busB, busW, aluA, preAluB, preAluB2, aluB, aluResult, memData, zeros, unflippedMemDataUnsigned;
+    reg      [31:0] memDataSigned, memDataUnsigned, flippedAluResult, flippedBusB;
     wire      [4:0] rW;
     wire            preZFlag;
-    wire     [31:0] shiftValue, extendedImm;
+    wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
+    wire      [1:0] flippedDataSize;
     
-    register_file REGISTERS(clk, regWr, rS1, rS2, rW, busW, aluA, busB);
+    assign zeros = 32'b00000000000000000000000000000000;
     
-    mux_5 REG_DST_MUX(regDst, rS2, rD, rW);
+		assign extendedImmOut = extendedImm;
+		assign registerS1Out = busA;
     
+    register_file REGISTERS(clk, regWr, rS1, rS2, rW, busW, busA, busB);
+    
+    mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
+    
+    mux_5 REG_31_MUX(link, preRW, 5'b11111, rW);
+        
     alu ALU_MODULE(aluA, aluB, alu0, alu1, alu2, alu3, alu4, alu5, aluResult);
     
-    mux_32 ALU_B_MUX(aluSrc, busB, extendedImm, prealuB);
+    mux_32 ALU_A_MUX((loadHigh or link), busA, zeros, aluA);
     
-    mux_32 ALU_B_MUX2((alu2 and (not alu5)), prealuB, shiftValue, aluB);
+    mux_32 ALU_B_MUX(aluSrc, busB, finalImm, preAluB);
+    
+    mux_32 ALU_B_MUX2(link, shiftValue, pcPlus4, preAluB2);
+    
+    mux_32 ALU_B_MUX3(((alu2 and (not alu5)) or link), preAluB, preAluB2, aluB);
     
     SignExtender EXTENDER(imm16, extendedImm);
     
-    dmem DATA_MEM(aluResult[0:31], memDataUnsigned[0:31], busB[0:31], memWr, dataSize[0:1], clk);
+    assign immHigh[31:16] = imm16;
+    assign immHigh[15:0] = 116'b0000000000000000;
+    
+    mux_32 IMM_MUX(loadHigh, extendedImm, immHigh, finalImm);
+    
+    always @(unflippedMemDataUnsigned) begin
+        for (i=0; i < 32; i=i+1) begin
+            memDataUnsigned[i] <= unflippedMemDataUnsigned[31 - i];
+        end
+    end
+    
+    always @(aluResult) begin
+        for (j=0; j < 32; j=j+1) begin
+            flippedAluResult[j] <= aluResult[31 - j];
+        end
+    end
+    
+     always @(busB) begin
+        for (k=0; k < 32; k=k+1) begin
+            flippedBusB[k] <= busB[31 - k];
+        end
+    end
+    
+    assign flippedDataSize = {dataSize[0], dataSize[1]};
+        
+    dmem DATA_MEM(aluResult, unflippedMemDataUnsigned, busB, memWr, flippedDataSize, clk);
     
     mux_32 WR_MUX(wSrc, aluResult, memData, busW);
     
