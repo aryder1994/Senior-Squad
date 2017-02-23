@@ -34,7 +34,7 @@ module datapath(
 		assign extendedImmOut = extendedImm;
 		assign registerS1Out = busA;
     
-    register_file REGISTERS(clk, regWr, rS1, rS2, rW, busW, busA, busB);
+    Reg_file REGISTERS(rS1, rS2, rW, busW, busA, busB, regWr, clk);
     
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
@@ -42,13 +42,13 @@ module datapath(
         
     alu ALU_MODULE(aluA, aluB, alu0, alu1, alu2, alu3, alu4, alu5, aluResult);
     
-    mux_32 ALU_A_MUX((loadHigh or link), busA, zeros, aluA);
+    mux_32 ALU_A_MUX((loadHigh && link), busA, zeros, aluA);
     
     mux_32 ALU_B_MUX(aluSrc, busB, finalImm, preAluB);
     
     mux_32 ALU_B_MUX2(link, shiftValue, pcPlus4, preAluB2);
     
-    mux_32 ALU_B_MUX3(((alu2 and (not alu5)) or link), preAluB, preAluB2, aluB);
+    mux_32 ALU_B_MUX3(((alu2 && (! alu5)) || link), preAluB, preAluB2, aluB);
     
     SignExtender EXTENDER(imm16, extendedImm);
     
@@ -57,19 +57,22 @@ module datapath(
     
     mux_32 IMM_MUX(loadHigh, extendedImm, immHigh, finalImm);
     
+    integer i;
     always @(unflippedMemDataUnsigned) begin
         for (i=0; i < 32; i=i+1) begin
             memDataUnsigned[i] <= unflippedMemDataUnsigned[31 - i];
         end
     end
     
+    integer j;
     always @(aluResult) begin
         for (j=0; j < 32; j=j+1) begin
             flippedAluResult[j] <= aluResult[31 - j];
         end
     end
     
-     always @(busB) begin
+    integer k;
+    always @(busB) begin
         for (k=0; k < 32; k=k+1) begin
             flippedBusB[k] <= busB[31 - k];
         end
@@ -102,14 +105,15 @@ module datapath(
   	      	    memDataSigned[31:8] <= {24{memDataUnsigned[7]}};
   	      	    memDataSigned[7:0] <= memDataUnsigned[7:0];
   	      	end
-  	      	default:
+  	      	default: begin
+  	      	end
   	    endcase
   	end
   	
   	mux_32 MEM_SIGNED(memSign, memDataUnsigned, memDataSigned, memData);
   	
   	initial begin
-  	    $readmemh("data.hex", DATA_MEM.mem)
+  	    $readmemh("data.hex", DATA_MEM.mem);
   	end
-end module
+endmodule
     
