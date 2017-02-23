@@ -1,4 +1,4 @@
-module Reg_file(rA, rB, rW, busW, bus, busA, busB, regWr, clk);
+module Reg_file(rA, rB, rW, busW, busA, busB, regWr, clk);
   
   input [31:0] busW;
   input [4:0] rA, rB, rW; 
@@ -9,30 +9,30 @@ module Reg_file(rA, rB, rW, busW, bus, busA, busB, regWr, clk);
   output[31:0] busA, busB;
   reg [31:0] busA, busB;
   
-  always@(busW, rA, rB, rW, regWr, bus, clk)
+  always@(busW, rA, rB, rW, regWr, bus, posedge clk)
     begin
 
-			if(posedge clk & regWr == 1)
+			if(clk & regWr == 1)
 			begin
 			
 			register REGISTERn(busW, bus, regWr, clk);
 			
+				
+				
+				if(clk & rW == 1 & regWr == 1)
+				begin
+				
+				register REGISTERn(bus, busA, rW, clk);
+				
+				end
+				
+				else if(clk & rW == 0 & regWr == 1)
+				begin
+				
+				register REGISTERn(bus, busB, rW, clk);
+				
+				end
 			end
-			
-			if(posedge clk & rW == 1 & regWr == 1)
-			begin
-			
-			register REGISTERn(bus, busA, rW, clk);
-			
-			end
-			
-			elsif(posedge clk & rW == 0 & regWr == 1)
-			begin
-			
-			register REGISTERn(bus, busB, rW, clk);
-			
-			end
-			
       
     end
 endmodule
