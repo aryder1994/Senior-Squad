@@ -28,7 +28,7 @@ module datapath(
     output   [31:0] registerS1Out;
     
     wire     [31:0] busA, busB, busW, aluA, preAluB, preAluB2, aluB, aluResult, memData, zeros, unshiftedMemDataUnsigned;
-    reg      [31:0] memDataSigned, memDataUnsigned, flippedAluResult, flippedBusB;
+    reg      [31:0] memDataSigned, memDataUnsigned;
     wire      [4:0] rW, preRW;
     wire            preNZFlag;
     wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
@@ -60,20 +60,6 @@ module datapath(
     assign immHigh[15:0] = 116'b0000000000000000;
     
     mux_32 IMM_MUX(loadHigh, extendedImm, immHigh, finalImm);
-    
-    integer j;
-    always @(aluResult) begin
-        for (j=0; j < 32; j=j+1) begin
-            flippedAluResult[j] <= aluResult[j];
-        end
-    end
-    
-    integer k;
-    always @(busB) begin
-        for (k=0; k < 32; k=k+1) begin
-            flippedBusB[k] <= busB[k];
-        end
-    end
         
     dmem DATA_MEM(aluResult, unshiftedMemDataUnsigned, busB, memWr, dataSize, clk);
     

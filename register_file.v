@@ -1,10 +1,9 @@
-
-module register_file(clk, reset, regWr, rS1, rS2, rW, busWIn, busA, busB);
+module register_file(clk, reset, regWr, rS1, rS2, rW, busW, busA, busB);
     input          clk;
     input          reset;
     input          regWr;
     input    [4:0] rS1, rS2, rW;
-    input   [31:0] busWIn;
+    input   [31:0] busW;
     output  [31:0] busA, busB;
 
     wire    [31:0] zeros, busW;
@@ -20,17 +19,13 @@ module register_file(clk, reset, regWr, rS1, rS2, rW, busWIn, busA, busB);
     wire    [31:0] b_0_8, b_0_9, b_0_10, b_0_11, b_0_12, b_0_13, b_0_14, b_0_15;
     wire    [31:0] b_1_0, b_1_1,  b_1_2,  b_1_3,  b_1_4,  b_1_5,  b_1_6,  b_1_7;
     wire    [31:0] b_2_0, b_2_1,  b_2_2,  b_2_3,  b_3_0,  b_3_1,  b_4_0;
-    wire    [31:0] regWr_32_init, regWr_32, regWr_32_Regular, rW_32;
+    wire    [31:0] regWr_32_init, regWr_32, rW_32;
     wire           regWr_1,  regWr_2,  regWr_3,  regWr_4,  regWr_5,  regWr_6,  regWr_7,  regWr_8,  regWr_9;
     wire           regWr_10, regWr_11, regWr_12, regWr_13, regWr_14, regWr_15, regWr_16, regWr_17, regWr_18;
     wire           regWr_19, regWr_20, regWr_21, regWr_22, regWr_23, regWr_24, regWr_25, regWr_26, regWr_27;
     wire           regWr_28, regWr_29, regWr_30, regWr_31;
 
     assign zeros = 32'b00000000000000000000000000000000;
-
-    mux_32 MUX(reset, busWIn, busWIn, busW);
-    
-    mux_32 WR_MUX(reset, regWr_32_Regular, 32'b11111111XXXXXXXXXXXXXXXXXXXXXXXX, regWr_32);
 
     register REG0(clk,1'b1,zeros,r0);
 
@@ -228,7 +223,7 @@ module register_file(clk, reset, regWr, rS1, rS2, rW, busWIn, busA, busB);
     assign rW_32[31:5] = 27'b000000000000000000000000000;
     assign rW_32[4:0] = rW;
 
-		sll_32 SHIFT(regWr_32_init,rW_32,regWr_32_Regular);
+		sll_32 SHIFT(regWr_32_init,rW_32,regWr_32);
 
     assign regWr_1 = regWr_32[1];
     assign regWr_2 = regWr_32[2];
