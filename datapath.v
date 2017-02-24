@@ -1,6 +1,9 @@
 // Datapath for Single Cycle Processor
+
 module datapath(
 		clk,
+		reset,
+		endProgram,
 		rS1, rS2, rD,
 		imm16,
 		regDst, aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign, loadHigh, link,
@@ -11,6 +14,8 @@ module datapath(
 		registerS1Out);
 		
 		input           clk;
+		input           reset;
+		input           endProgram;
 		input     [4:0] rS1, rS2, rD;
 		input    [15:0] imm16;
 		input           regDst, aluSrc;
@@ -22,19 +27,18 @@ module datapath(
     output   [31:0] extendedImmOut;
     output   [31:0] registerS1Out;
     
-    wire     [31:0] busA, busB, busW, aluA, preAluB, preAluB2, aluB, aluResult, memData, zeros, unflippedMemDataUnsigned;
+    wire     [31:0] busA, busB, busW, aluA, preAluB, preAluB2, aluB, aluResult, memData, zeros, unshiftedMemDataUnsigned;
     reg      [31:0] memDataSigned, memDataUnsigned, flippedAluResult, flippedBusB;
     wire      [4:0] rW, preRW;
-    wire            preZFlag;
+    wire            preNZFlag;
     wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
-    wire      [1:0] flippedDataSize;
     
     assign zeros = 32'b00000000000000000000000000000000;
     
 		assign extendedImmOut = extendedImm;
 		assign registerS1Out = busA;
     
-    register_file REGISTERS(clk, regWr, rS1, rS2, rW, busW, busA, busB);
+    register_file REGISTERS(clk, reset, regWr, rS1, rS2, rW, busW, busA, busB);
     
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
@@ -42,7 +46,7 @@ module datapath(
         
     alu ALU_MODULE(aluA, aluB, alu0, alu1, alu2, alu3, alu4, alu5, aluResult);
     
-    mux_32 ALU_A_MUX((loadHigh && link), busA, zeros, aluA);
+    mux_32 ALU_A_MUX((loadHigh || link), busA, zeros, aluA);
     
     mux_32 ALU_B_MUX(aluSrc, busB, finalImm, preAluB);
     
@@ -57,53 +61,50 @@ module datapath(
     
     mux_32 IMM_MUX(loadHigh, extendedImm, immHigh, finalImm);
     
-    integer i;
-    always @(unflippedMemDataUnsigned) begin
-        for (i=0; i < 32; i=i+1) begin
-            memDataUnsigned[i] <= unflippedMemDataUnsigned[31 - i];
-        end
-    end
-    
     integer j;
     always @(aluResult) begin
         for (j=0; j < 32; j=j+1) begin
-            flippedAluResult[j] <= aluResult[31 - j];
+            flippedAluResult[j] <= aluResult[j];
         end
     end
     
     integer k;
     always @(busB) begin
         for (k=0; k < 32; k=k+1) begin
-            flippedBusB[k] <= busB[31 - k];
+            flippedBusB[k] <= busB[k];
         end
     end
-    
-    assign flippedDataSize = {dataSize[0], dataSize[1]};
         
-    dmem DATA_MEM(aluResult, unflippedMemDataUnsigned, busB, memWr, flippedDataSize, clk);
+    dmem DATA_MEM(aluResult, unshiftedMemDataUnsigned, busB, memWr, dataSize, clk);
     
     mux_32 WR_MUX(wSrc, aluResult, memData, busW);
     
-    or_32_input ZERO_CHECK(busA, preZFlag);
+    or_32_input ZERO_CHECK(busA, preNZFlag);
     
-    assign zFlag = preZFlag;
-    assign nzFlag = !preZFlag;
+    assign zFlag = ~preNZFlag;
+    assign nzFlag = preNZFlag;
     
     assign shiftValue[31:5] = 27'b000000000000000000000000000;
     assign shiftValue[4:0] = preAluB[4:0];
     
-    always @(memDataUnsigned) begin
+    always @(unshiftedMemDataUnsigned) begin
   	    case (dataSize)
   	        2'b11: begin
-  	            memDataSigned <= memDataUnsigned;
+  	            memDataSigned <= unshiftedMemDataUnsigned;
+  	            memDataUnsigned <= unshiftedMemDataUnsigned;
   	        end
   	        2'b01: begin
-  	      	    memDataSigned[31:16] <= {16{memDataUnsigned[15]}};
-  	      	    memDataSigned[15:0] <= memDataUnsigned[15:0];
+  	      	    memDataSigned[31:16] <= {16{unshiftedMemDataUnsigned[31]}};
+  	      	    memDataSigned[15:0] <= unshiftedMemDataUnsigned[31:16];
+  	      	    memDataUnsigned[31:16] <= 16'b0000000000000000;
+  	      	    memDataUnsigned[15:0] <= unshiftedMemDataUnsigned[31:16];
+  	      	    
   	      	end
   	      	2'b00: begin
-  	      	    memDataSigned[31:8] <= {24{memDataUnsigned[7]}};
-  	      	    memDataSigned[7:0] <= memDataUnsigned[7:0];
+  	      	    memDataSigned[31:8] <= {24{unshiftedMemDataUnsigned[31]}};
+  	      	    memDataSigned[7:0] <= unshiftedMemDataUnsigned[31:24];
+  	      	    memDataUnsigned[31:8] <= 24'b000000000000000000000000;
+  	      	    memDataUnsigned[7:0] <= unshiftedMemDataUnsigned[31:24];
   	      	end
   	      	default: begin
   	      	end
@@ -114,6 +115,11 @@ module datapath(
   	
   	initial begin
   	    $readmemh("data.hex", DATA_MEM.mem);
+  	end
+  	
+  	always @(posedge endProgram) begin
+  	    $writememh("results.hex", DATA_MEM.mem);
+  	    $finish;
   	end
 endmodule
     

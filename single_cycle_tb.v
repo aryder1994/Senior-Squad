@@ -1,4 +1,4 @@
-`timescale 1ns/1ns
+`timescale 1ns/1ps
 
 
 module single_cycle_tb;
@@ -9,7 +9,7 @@ module single_cycle_tb;
 	
 	single_cycle single_cycle_0(
 		.clk(clk),
-		.pcSelector(pcSelector),
+		.pcSelect(pcSelector),
 		.startAddress(startAddress)
 		);
 		
@@ -25,9 +25,9 @@ module single_cycle_tb;
 initial
 begin
 
-		startAddress = 32'b00000000000000000000000000000000;
+		startAddress = 32'b00000000000000000001000000000000;
 				
-		#11 pcSelector = 0;
+		#16 pcSelector = 0;
 		
 		
 		

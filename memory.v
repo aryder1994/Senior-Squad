@@ -1,6 +1,6 @@
 
 module imem(addr, instr);
-    parameter SIZE=4096;
+    parameter SIZE=32768;
     parameter OFFSET=0;
 
     input [0:31] addr;
@@ -64,7 +64,7 @@ module memload_example();
 
     integer dfileobj, dmaddr, r, k, i;
 
-    imem #(.SIZE(1024)) IMEM(.addr(iaddr), .instr(instr));
+    imem #(.SIZE(16384)) IMEM(.addr(iaddr), .instr(instr));
     dmem #(.SIZE(16384)) DMEM(.addr(daddr), .rData(drdata), .wData(dwdata), .writeEnable(dwrite), .dsize(dsize), .clk(clk));
 
     initial begin

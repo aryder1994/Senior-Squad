@@ -1,6 +1,5 @@
 //SET Operations
 
-
 //SEQ
 
 module seq(is_not_zero, out);

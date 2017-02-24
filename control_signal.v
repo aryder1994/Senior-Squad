@@ -1,9 +1,12 @@
+
 module control_signal(instr, rS1, rS2, rD, imm16, regDst, aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, dataSize, memSign, loadHigh, link, beqz, bnez, jump, jumpReg, value);
 
     input [31:0] instr;
-    output reg regDst, aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, dataSize, memSign, loadHigh, link, beqz, bnez, jump, jumpReg, value;
+    output reg regDst, aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign, loadHigh, link, beqz, bnez, jump, jumpReg;
+	output reg [1:0] dataSize;
 	output reg [4:0] rS1, rS2, rD;
 	output reg [15:0] imm16;
+	output reg [25:0] value;
 
 
     always@(instr)
