@@ -1,6 +1,6 @@
-// Datapath for Single Cycle Processor
+// Datapath for Pipeline Processor
 
-module datapath(
+module pipeline_datapath(
 		clk,
 		reset,
 		endProgram,
@@ -8,7 +8,8 @@ module datapath(
 		imm16,
 		regDst,
 		aluCtrl, exCtrl, memCtrl, wrCtrl,
-		pcPlus4,
+		ifIdWr,
+		pcPlus4, instruction
 		zFlag, nzFlag,
 		extendedImmOut,
 		registerS1Out,
@@ -19,21 +20,41 @@ module datapath(
 		input           endProgram;
 		input     [4:0] rS1, rS2, rD;
 		input    [15:0] imm16;
-		input           regDst;
+		input     [2:0] idCtrl;
 		input     [5:0] aluCtrl;
 		input     [6:0] exCtrl;
 		input     [4:0] memCtrl;
 		input     [1:0] wrCtrl;
-		input    [31:0] pcPlus4;
+		input           ifIdWr;
+		input    [31:0] pcPlus4, preInstruction;
+		input           branch;
 		output          zFlag, nzFlag;
     output   [31:0] extendedImmOut;
     output   [31:0] registerS1Out;
+    output   [31:0] pcPlus4IdOut;
     
-    wire     [31:0] busA, busB, busW, aluA, preAluB, preAluB2, aluB, aluResult, memData, zeros, unshiftedMemDataUnsigned;
+    wire     [31:0] preBusA, busA, preBusB, busB, busW, preAluA, preAluA2, aluA;
+    wire     [31:0] preAluB, preAluB2, preAluB3, preAluB4, aluB;
+    wire     [31:0] aluResult, memData, zeros, unshiftedMemDataUnsigned;
     reg      [31:0] memDataSigned, memDataUnsigned;
     wire      [4:0] rW, preRW;
     wire            preNZFlag;
     wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
+    wire            regDst, exMemIdA, exMemIdB;
+    wire     [31:0] instruction;
+    wire     [31:0] pcPlus4Id, instructionId;
+    wire     [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
+    wire      [4:0] rWEx, rWMem, rWWb;
+    wire      [6:0] exCtrlEx;
+    wire      [4:0] memCtrlEx, memCtrlMem;
+    wire      [1:0] wrCtrlEx, wrCtrlMem, wrCtrlWb;
+    wire     [31:0] aluResultMem, busBMem, busBMem2;
+    wire     [31:0] aluResultWb, memDataWb;
+    wire            alu0, alu1, alu2, alu3, alu4, alu5;
+    wire            aluSrc, loadHigh, link, exMemExA, exMemExB, memWbExA, memWbExB;
+    wire      [1:0] dataSize;
+    wire            memWr, memSign, memWbMem;
+    wire            wSrc, regWr;
     
     assign zeros = 32'b00000000000000000000000000000000;
     
@@ -41,17 +62,28 @@ module datapath(
 		assign registerS1Out = busA;
 		
 		// IF STAGE
-			
+		
 		assign ifIdWr = pcSelect or ifIdWrIn;
+		
+		mux_32 INSTRUCTIONMUX(branch, preInstruction, zeros, instruction);
 		
 		ifIdRegister IFID(clk, ifIdWr, pcPlus4, instruction, pcPlus4Id, instructionId);
 		
 		// ID STAGE
+
+		assign pcPlus4IdOut = pcPlus4Id;
+		
+		assign regDst = idCtrl[0];
+		assign exMemIdA = idCtrl[1];
+		assign exMemIdB = idCtrl[2];
     
     SignExtender EXTENDER(imm16, extendedImm);
     
-    register_file REGISTERS(clk, reset, regWr, rS1, rS2, rWWb, busW, busA, busB);
+    register_file REGISTERS(clk, reset, regWr, rS1, rS2, rWWb, busW, preBusA, preBusB);
     
+    mux_32 EXMEMIDA(exMemIdA, preBusA, aluResultMem, busA);
+    mux_32 EXMEMIDB(exMemIdB, preBusB, aluResultMem, busB);
+            
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
     mux_5 REG_31_MUX(link, preRW, 5'b11111, rW);
@@ -88,20 +120,26 @@ module datapath(
         
     mux_32 IMM_MUX(loadHigh, extendedImmEx, immHigh, finalImm);
     
+    mux_32 EXMEMEXA(exMemExA, busAEx, aluResultMem, preAluA);
+    mux_32 MEMWBEXA(memWbExA, preAluA, busW, preAluA2);
+        
+    mux_32 ALU_A_MUX((loadHigh || link), preAluA2, zeros, aluA);
+    
+    mux_32 EXMEMEXB(exMemExB, busBEx, aluResultMem, preAluB);
+    mux_32 MEMWBEXB(memWbExB, preAluB, busW, preAluB2);
+    
+    mux_32 ALU_B_MUX(aluSrc, preAluB2, finalImm, preAluB3);
+    
     assign shiftValue[31:5] = 27'b000000000000000000000000000;
-    assign shiftValue[4:0] = preAluB[4:0];
+    assign shiftValue[4:0] = preAluB3[4:0];
     
-    mux_32 ALU_A_MUX((loadHigh || link), busAEx, zeros, aluA);
+    mux_32 ALU_B_MUX2(link, shiftValue, pcPlus4Ex, preAluB4);
     
-    mux_32 ALU_B_MUX(aluSrc, busBEx, finalImm, preAluB);
-    
-    mux_32 ALU_B_MUX2(link, shiftValue, pcPlus4Ex, preAluB2);
-    
-    mux_32 ALU_B_MUX3(((alu2 && (! alu5)) || link), preAluB, preAluB2, aluB);
+    mux_32 ALU_B_MUX3(((alu2 && (! alu5)) || link), preAluB3, preAluB4, aluB);
         
     alu ALU_MODULE(aluA, aluB, alu0, alu1, alu2, alu3, alu4, alu5, aluResult);
     
-    exMemRegister EXMEM(clk, 1'b1, aluResult, busBEx, rWEx, memCtrlEx, wrCtrlEx,
+    exMemRegister EXMEM(clk, 1'b1, aluResult, preAluB2, rWEx, memCtrlEx, wrCtrlEx,
 											  aluResultMem, busBMem, rWMem, memCtrlMem, wrCtrlMem);
     
     // MEM STAGE
@@ -110,8 +148,10 @@ module datapath(
     assign memWr = memCtrlMem[2];
     assign memSign = memCtrlMem[3];
     assign memWbMem = memCtrlMem[4];
-        
-    dmem DATA_MEM(aluResultMem, unshiftedMemDataUnsigned, busBMem, memWr, dataSize, clk);
+    
+    mux_32 MEMWBMEM(memWbMem, busBMem, busW, busBMem2);
+    
+    dmem DATA_MEM(aluResultMem, unshiftedMemDataUnsigned, busBMem2, memWr, dataSize, clk);
     
     always @(unshiftedMemDataUnsigned) begin
   	    case (dataSize)
