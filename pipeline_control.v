@@ -81,10 +81,7 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 		beqz = 0;
 		bnez = 0;
 		jump = 0;
-		value = instr[25:0];
-		
-		if (rS1 == prevrW)
-			
+		value = instr[25:0];		
 
 
 
