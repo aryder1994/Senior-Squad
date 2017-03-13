@@ -1,6 +1,6 @@
 // Single Cycle Fetch Unit
 
-module fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4Out, branchOut, endProgram);
+module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4Out, branchOut, endProgram);
     input           clk;
     input           pcSelect;
     input    [31:0] startAddress;
@@ -21,7 +21,7 @@ module fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, BNEZ, jump
     output          endProgram;
     reg             endProgram;
     
-    wire     [31:0] currentAddress, preCurrentAddress, preNextAddressA, preNextAddressB, preNextAddressC nextAddress;
+    wire     [31:0] currentAddress, preCurrentAddress, preNextAddressA, preNextAddressB, preNextAddressC, nextAddress;
     wire     [31:0] four;
     wire     [31:0] pcPlus4, sumB, extendedValue, jumpValue;
     wire            cout, overflow;

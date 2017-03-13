@@ -1,10 +1,10 @@
 
-module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, beqz, bnez, jump, jumpReg, value, stall);
+module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, beqz, bnez, jump, jumpReg, value, stall);
 
     input [31:0] instr;
 	input [4:0] rW;
 	input clk;
-	reg aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign, loadHigh, link, regOut, stallTemp, prevrW, prevrW2, prevLoad, prevLoad2; 
+	reg aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, memSign, loadHigh, link, stallTemp, regWr, isLoad; 
     reg exMemExA;
 	reg exMemExB;
 	reg memWbExA;
@@ -20,50 +20,35 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 	output reg [15:0] imm16;
 	output reg [25:0] value;
 	output reg [5:0] aluCtrl;
-	output reg [2:0] exCtrl;
+	output reg [6:0] exCtrl;
 	output reg [4:0] memCtrl;
 	output reg [1:0] wrCtrl;
-	output reg 		 stall;
+	output  stall;
 	
+	wire  [4:0] prevrW, prevrW2;
+	wire        prevLoad, prevLoad2, regOut, regWrTemp, isLoadWire;
+	
+	assign regWrTemp = regWr;
 	dff_5 previousRW(clk, rW, prevrW);
 	dff_5 previousRW2(clk, prevrW, prevrW2);
-	dff previousStore(clk, memWr, prevLoad);	
+	dff previousStore(clk, isLoadWire, prevLoad);	
 	dff previousStore2(clk, prevLoad, prevLoad2);
-	mux regWrMux (stallTemp, regWr, 0, regOut);
+	mux regWrMux (stallTemp, regWrTemp, 0, regOut);
 	assign stall = stallTemp;
+	assign isLoadWire = isLoad;
 	
     always@(instr)
 
     begin
-		idCtrl[0] = regDst;
-		 idCtrl[1] = exMemIdA;
-		idCtrl[2] = exMemIdB;
-		
-		aluCtrl[5] = alu0;
-		aluCtrl[4] = alu1;
-		aluCtrl[3] = alu2;
-		aluCtrl[2] = alu3;
-		aluCtrl[1] = alu4;
-		aluCtrl[0] = alu5;
-		
-		exCtrl[0] = aluSrc;
-		exCtrl[1] = loadHigh;
-		exCtrl[2] = link;
-		exCtrlEx[3] = exMemExA;
-		exCtrlEx[4] = exMemExB;
-		exCtrlEx[5] = memWbExA;
-		exCtrlEx[6] = memWbExB;
-		
-		memCtrl[1:0] = dataSize; 
-		memCtrl[2] = memWr;
-		memCtrl[3] = memSign;
-		memCtrl[4] = memWbMem;
-		
-		wrCtrl[0] = wSrc;
-		wrCtrl[1] = regOut;
-		
-		
-		
+       isLoad = 0;
+       stallTemp = 0;
+       exMemExA = 0;
+       exMemExB = 0;
+       memWbExA = 0;
+       memWbExB = 0;
+       memWbMem = 0;
+       exMemIdA = 0;
+       exMemIdB = 0;
 
 		rS1 = instr[25:21];
 		rS2 = instr[20:16];
@@ -173,11 +158,13 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 				begin
 					alu4 = 0;
 					alu5 = 1;
+					isLoad = 1;
 				end
 
 				if (instr[31:28] == 4'b1001)            // LBU & LHU
 				begin
-					memSign = 0;                
+					memSign = 0;
+               isLoad = 1;                
 				end
 
 				if (instr[31:26] == 6'b001111)          // LHI
@@ -185,8 +172,8 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 					loadHigh = 1;
 					alu4 = 0;
 					alu5 = 1;
+               isLoad = 1;
 				end
-
 
 			end
 
@@ -208,7 +195,6 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 				exMemExB = 1;
 			end
 			
-			begin
 			if (rS1 == prevrW2)
 			begin
 				exMemIdA = 1;
@@ -219,25 +205,25 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 				exMemIdB = 1;
 			end
 			
-			if (rS1 == prevrW and prevLoad == 1)
+			if ((rS1 == prevrW) && (prevLoad == 1))
 			begin
 				memWbExA = 1;
 				stallTemp = 1;
 			end
 			
-			if (rS2 == prevrW and prevLoad == 1)
+			if ((rS2 == prevrW) && (prevLoad == 1))
 			begin
 				memWbExB = 1;
 				stallTemp = 1;
 			end
 			
-			if (rS1 == prevrW2 and prevLoad2 == 1)
+			if ((rS1 == prevrW2) && (prevLoad2 == 1))
 			begin
 				memWbExA = 1;
 			
 			end
 			
-			if (rS2 == prevrW2 and prevLoad2 == 1)
+			if ((rS2 == prevrW2) && (prevLoad2 == 1))
 			begin
 				memWbExB = 1;
 				
@@ -378,8 +364,7 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 				end
 			endcase
 		end
-	   
-
+		
 		else                                // I-type instructions   		   
 		begin
 			if (rS1 == prevrW)
@@ -387,22 +372,19 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 				exMemExA = 1;
 			end
 				
-		
-			
-			begin
 			if (rS1 == prevrW2)
 			begin
 				exMemIdA = 1;
 			end
 			
-			if (rS1 == prevrW and prevLoad == 1)
+			if ((rS1 == prevrW) && (prevLoad == 1))
 			begin
 				memWbExA = 1;
 				stallTemp = 1;
 			end
 			
 						
-			if (rS1 == prevrW2 and prevLoad2 == 1)
+			if ((rS1 == prevrW2) && (prevLoad2 == 1))
 			begin
 				memWbExA = 1;
 			
@@ -549,7 +531,32 @@ module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCt
 				
 			endcase
 		end
-
+      idCtrl[0] = regDst;
+      idCtrl[1] = exMemIdA;
+      idCtrl[2] = exMemIdB;
+      
+      aluCtrl[5] = alu0;
+      aluCtrl[4] = alu1;
+      aluCtrl[3] = alu2;
+      aluCtrl[2] = alu3;
+      aluCtrl[1] = alu4;
+      aluCtrl[0] = alu5;
+      
+      exCtrl[0] = aluSrc;
+      exCtrl[1] = loadHigh;
+      exCtrl[2] = link;
+      exCtrl[3] = exMemExA;
+      exCtrl[4] = exMemExB;
+      exCtrl[5] = memWbExA;
+      exCtrl[6] = memWbExB;
+      
+      memCtrl[1:0] = dataSize; 
+      memCtrl[2] = memWr;
+      memCtrl[3] = memSign;
+      memCtrl[4] = memWbMem;
+      
+      wrCtrl[0] = wSrc;
+      wrCtrl[1] = regOut;
     end
 endmodule
 

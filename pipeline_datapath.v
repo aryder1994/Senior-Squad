@@ -7,8 +7,9 @@ module pipeline_datapath(
 		rS1, rS2, rD,
 		imm16,
 		idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl,
-		ifIdWr,
-		pcPlus4, preInstruction
+		ifIdWrIn,
+		pcPlus4, preInstruction,
+		branch,
 		zFlag, nzFlag,
 		extendedImmOut,
 		registerS1Out,
@@ -26,7 +27,7 @@ module pipeline_datapath(
 		input     [6:0] exCtrl;
 		input     [4:0] memCtrl;
 		input     [1:0] wrCtrl;
-		input           ifIdWr;
+		input           ifIdWrIn;
 		input    [31:0] pcPlus4, preInstruction;
 		input           branch;
 		output          zFlag, nzFlag;
@@ -48,6 +49,7 @@ module pipeline_datapath(
     wire     [31:0] pcPlus4Id, instructionId;
     wire     [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
     wire      [4:0] rWEx, rWMem, rWWb;
+    wire      [5:0] aluCtrlEx;
     wire      [6:0] exCtrlEx;
     wire      [4:0] memCtrlEx, memCtrlMem;
     wire      [1:0] wrCtrlEx, wrCtrlMem, wrCtrlWb;
@@ -58,6 +60,7 @@ module pipeline_datapath(
     wire      [1:0] dataSize;
     wire            memWr, memSign, memWbMem;
     wire            wSrc, regWr;
+    wire            ifIdWr;
     
     assign zeros = 32'b00000000000000000000000000000000;
     
@@ -66,7 +69,7 @@ module pipeline_datapath(
 		
 		// IF STAGE
 		
-		assign ifIdWr = pcSelect or ifIdWrIn;
+		assign ifIdWr = reset || ifIdWrIn;
 		
 		mux_32 INSTRUCTIONMUX(branch, preInstruction, zeros, instruction);
 		
@@ -90,6 +93,8 @@ module pipeline_datapath(
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
     mux_5 REG_31_MUX(link, preRW, 5'b11111, rW);
+    
+    assign rWOut = rW;
     
     or_32_input ZERO_CHECK(busA, preNZFlag);
     

@@ -9,7 +9,7 @@ module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl,
   input [4:0] memCtrl;
   input [1:0] wrCtrl;
   output reg [4:0] rWEx;
-  output reg [31:0] pcPlus4IdEx, extendedImmEx, busAEx, busBEx;
+  output reg [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
   output reg [5:0] aluCtrlEx;
   output reg [6:0] exCtrlEx;
   output reg [4:0] memCtrlEx;
@@ -32,7 +32,7 @@ module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl,
 				else
 				begin
 					rWEx = rWEx;
-					pcPlus4Ex = pcPlus4IdEx;
+					pcPlus4Ex = pcPlus4Ex;
 					extendedImmEx = extendedImmEx;
 					busAEx = busAEx;
 					busBEx = busBEx;
