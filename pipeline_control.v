@@ -1,8 +1,10 @@
 
-module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, beqz, bnez, jump, jumpReg, value);
+module control_signal(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, beqz, bnez, jump, jumpReg, value, stall);
 
     input [31:0] instr;
-	reg aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign, loadHigh, link; 
+	input [4:0] rW;
+	input clk;
+	reg aluSrc, alu0, alu1, alu2, alu3, alu4, alu5, memWr, wSrc, regWr, memSign, loadHigh, link, regOut, stallTemp, prevrW, prevrW2, prevLoad, prevLoad2; 
     reg exMemExA;
 	reg exMemExB;
 	reg memWbExA;
@@ -21,41 +23,48 @@ module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCt
 	output reg [2:0] exCtrl;
 	output reg [4:0] memCtrl;
 	output reg [1:0] wrCtrl;
+	output reg 		 stall;
 	
+	dff_5 previousRW(clk, rW, prevrW);
+	dff_5 previousRW2(clk, prevrW, prevrW2);
+	dff previousStore(clk, memWr, prevLoad);	
+	dff previousStore2(clk, prevLoad, prevLoad2);
+	mux regWrMux (stallTemp, regWr, 0, regOut);
+	assign stall = stallTemp;
 	
     always@(instr)
 
     begin
-		regDst = idCtrl[0];
-		exMemIdA = idCtrl[1];
-		exMemExB = idCtrl[2];
+		idCtrl[0] = regDst;
+		 idCtrl[1] = exMemIdA;
+		idCtrl[2] = exMemIdB;
 		
-		alu0 = aluCtrl[5];
-		alu1 = aluCtrl[4];
-		alu2 = aluCtrl[3];
-		alu3 = aluCtrl[2];
-		alu4 = aluCtrl[1];
-		alu5 = aluCtrl[0];
+		aluCtrl[5] = alu0;
+		aluCtrl[4] = alu1;
+		aluCtrl[3] = alu2;
+		aluCtrl[2] = alu3;
+		aluCtrl[1] = alu4;
+		aluCtrl[0] = alu5;
 		
-		aluSrc = exCtrl[0];
-		loadHigh = exCtrl[1];
-		link = exCtrl[2];
-		exMemExA = exCtrlEx[3];
-		exMemExB = exCtrlEx[4];
-		memWbExA = exCtrlEx[5];
-		memWbExB = exCtrlEx[6];
+		exCtrl[0] = aluSrc;
+		exCtrl[1] = loadHigh;
+		exCtrl[2] = link;
+		exCtrlEx[3] = exMemExA;
+		exCtrlEx[4] = exMemExB;
+		exCtrlEx[5] = memWbExA;
+		exCtrlEx[6] = memWbExB;
 		
-		dataSize = memCtrl[1:0];
-		memWr = memCtrl[2];
-		memSign = memCtrl[3];
-		memWbMem = memCtrl[4];
+		memCtrl[1:0] = dataSize; 
+		memCtrl[2] = memWr;
+		memCtrl[3] = memSign;
+		memCtrl[4] = memWbMem;
 		
-		wSrc = wrCtrl[0];
-		regWr = wrCtrl[1];
+		wrCtrl[0] = wSrc;
+		wrCtrl[1] = regOut;
 		
 		
 		
-1
+
 		rS1 = instr[25:21];
 		rS2 = instr[20:16];
 		rD = instr[15:11];
@@ -73,6 +82,9 @@ module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCt
 		bnez = 0;
 		jump = 0;
 		value = instr[25:0];
+		
+		if (rS1 == prevrW)
+			
 
 
 
@@ -83,6 +95,13 @@ module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCt
 				regWr = 0;
 				alu4 = 0;
 				alu5 = 1;
+				
+				if (rS2 == prevrW)
+				begin
+					memWbMem = 1;
+				end
+				
+				
 			end
 
 			else if (instr[31:27] == 5'b01001)      // JR & JALR
@@ -148,7 +167,8 @@ module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCt
 			begin
 				regWr = 0;
 			end
-			else
+			else			
+			
 			begin
 				regWr = 1;                       // for rest of instructions, write to destination reg
 
@@ -180,9 +200,52 @@ module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCt
 		
 
 		if (instr[31:26] == 6'b000000)      // r-type instructions opcode = 0  
-	  
-
 		begin
+			if (rS1 == prevrW)
+			begin
+				exMemExA = 1;
+			end
+				
+			if (rS2 == prevrW)
+			begin
+				exMemExB = 1;
+			end
+			
+			begin
+			if (rS1 == prevrW2)
+			begin
+				exMemIdA = 1;
+			end
+				
+			if (rS2 == prevrW2)
+			begin
+				exMemIdB = 1;
+			end
+			
+			if (rS1 == prevrW and prevLoad == 1)
+			begin
+				memWbExA = 1;
+				stallTemp = 1;
+			end
+			
+			if (rS2 == prevrW and prevLoad == 1)
+			begin
+				memWbExB = 1;
+				stallTemp = 1;
+			end
+			
+			if (rS1 == prevrW2 and prevLoad2 == 1)
+			begin
+				memWbExA = 1;
+			
+			end
+			
+			if (rS2 == prevrW2 and prevLoad2 == 1)
+			begin
+				memWbExB = 1;
+				
+			end
+		
 			case (instr[5:0])               // match by function
 				6'b100000:                  // add            
 				begin
@@ -320,9 +383,38 @@ module control_signal(instr, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCt
 		end
 	   
 
-		else                                // I-type instructions   
-
-		begin   
+		else                                // I-type instructions   		   
+		begin
+			if (rS1 == prevrW)
+			begin
+				exMemExA = 1;
+			end
+				
+		
+			
+			begin
+			if (rS1 == prevrW2)
+			begin
+				exMemIdA = 1;
+			end
+			
+			if (rS1 == prevrW and prevLoad == 1)
+			begin
+				memWbExA = 1;
+				stallTemp = 1;
+			end
+			
+						
+			if (rS1 == prevrW2 and prevLoad2 == 1)
+			begin
+				memWbExA = 1;
+			
+			end
+			
+			
+				
+			
+		
 			case (instr[31:26])               // match by function
 				6'b001000:                  // addi            
 				begin
