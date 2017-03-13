@@ -6,14 +6,15 @@ module pipeline_datapath(
 		endProgram,
 		rS1, rS2, rD,
 		imm16,
-		regDst,
-		aluCtrl, exCtrl, memCtrl, wrCtrl,
+		idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl,
 		ifIdWr,
-		pcPlus4, instruction
+		pcPlus4, preInstruction
 		zFlag, nzFlag,
 		extendedImmOut,
 		registerS1Out,
-		instructionId);
+		pcPlus4IdOut,
+		instructionId,
+		rWOut);
 		
 		input           clk;
 		input           reset;
@@ -32,6 +33,8 @@ module pipeline_datapath(
     output   [31:0] extendedImmOut;
     output   [31:0] registerS1Out;
     output   [31:0] pcPlus4IdOut;
+    output   [31:0] instructionId;
+    output    [4:0] rWOut;
     
     wire     [31:0] preBusA, busA, preBusB, busB, busW, preAluA, preAluA2, aluA;
     wire     [31:0] preAluB, preAluB2, preAluB3, preAluB4, aluB;
