@@ -1,6 +1,6 @@
 // Single Cycle Fetch Unit
 
-module fetch(clk, pcSelect, startAddress, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4Out, branchOut, endProgram);
+module fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4Out, branchOut, endProgram);
     input           clk;
     input           pcSelect;
     input    [31:0] startAddress;
