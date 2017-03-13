@@ -7,13 +7,15 @@ module pipeline_datapath(
 		rS1, rS2, rD,
 		imm16,
 		idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl,
-		ifIdWr,
-		pcPlus4, preInstruction
+		ifIdWrIn,
+		pcPlus4, preInstruction,
+		branch,
+		stall,
 		zFlag, nzFlag,
 		extendedImmOut,
 		registerS1Out,
 		pcPlus4IdOut,
-		instructionId,
+		instructionIdFinal,
 		rWOut);
 		
 		input           clk;
@@ -21,19 +23,20 @@ module pipeline_datapath(
 		input           endProgram;
 		input     [4:0] rS1, rS2, rD;
 		input    [15:0] imm16;
-		input     [2:0] idCtrl;
+		input     [3:0] idCtrl;
 		input     [5:0] aluCtrl;
 		input     [6:0] exCtrl;
 		input     [4:0] memCtrl;
 		input     [1:0] wrCtrl;
-		input           ifIdWr;
+		input           ifIdWrIn;
 		input    [31:0] pcPlus4, preInstruction;
 		input           branch;
+		input           stall;
 		output          zFlag, nzFlag;
     output   [31:0] extendedImmOut;
     output   [31:0] registerS1Out;
     output   [31:0] pcPlus4IdOut;
-    output   [31:0] instructionId;
+    output   [31:0] instructionIdFinal;
     output    [4:0] rWOut;
     
     wire     [31:0] preBusA, busA, preBusB, busB, busW, preAluA, preAluA2, aluA;
@@ -43,11 +46,12 @@ module pipeline_datapath(
     wire      [4:0] rW, preRW;
     wire            preNZFlag;
     wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
-    wire            regDst, exMemIdA, exMemIdB;
+    wire            regDst, exMemIdA, exMemIdB, linkId;
     wire     [31:0] instruction;
-    wire     [31:0] pcPlus4Id, instructionId;
+    wire     [31:0] pcPlus4Id, instructionId, instructionEx;
     wire     [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
     wire      [4:0] rWEx, rWMem, rWWb;
+    wire      [5:0] aluCtrlEx;
     wire      [6:0] exCtrlEx;
     wire      [4:0] memCtrlEx, memCtrlMem;
     wire      [1:0] wrCtrlEx, wrCtrlMem, wrCtrlWb;
@@ -58,6 +62,7 @@ module pipeline_datapath(
     wire      [1:0] dataSize;
     wire            memWr, memSign, memWbMem;
     wire            wSrc, regWr;
+    wire            ifIdWr, prevStall;
     
     assign zeros = 32'b00000000000000000000000000000000;
     
@@ -66,7 +71,7 @@ module pipeline_datapath(
 		
 		// IF STAGE
 		
-		assign ifIdWr = pcSelect or ifIdWrIn;
+		assign ifIdWr = reset || ifIdWrIn;
 		
 		mux_32 INSTRUCTIONMUX(branch, preInstruction, zeros, instruction);
 		
@@ -79,26 +84,33 @@ module pipeline_datapath(
 		assign regDst = idCtrl[0];
 		assign exMemIdA = idCtrl[1];
 		assign exMemIdB = idCtrl[2];
+		assign linkId = idCtrl[3];
+		
+		dff STALLER(clk, stall, prevStall);
+		
+		mux_32 INSTRMUX(0, instructionId, instructionEx, instructionIdFinal);
     
     SignExtender EXTENDER(imm16, extendedImm);
     
-    register_file REGISTERS(clk, reset, regWr, rS1, rS2, rWWb, busW, preBusA, preBusB);
+    register_file REGISTERS(~clk, reset, regWr, rS1, rS2, rWWb, busW, preBusA, preBusB);
     
     mux_32 EXMEMIDA(exMemIdA, preBusA, aluResultMem, busA);
     mux_32 EXMEMIDB(exMemIdB, preBusB, aluResultMem, busB);
             
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
-    mux_5 REG_31_MUX(link, preRW, 5'b11111, rW);
+    mux_5 REG_31_MUX(linkId, preRW, 5'b11111, rW);
+    
+    assign rWOut = rW;
     
     or_32_input ZERO_CHECK(busA, preNZFlag);
     
     assign zFlag = ~preNZFlag;
     assign nzFlag = preNZFlag;
     
-    idExRegister IDEX(clk, 1'b1, pcPlus4Id, extendedImm, busA, busB, rW,
+    idExRegister IDEX(clk, 1'b1, pcPlus4Id, instructionIdFinal, extendedImm, busA, busB, rW,
     									aluCtrl, exCtrl, memCtrl, wrCtrl,
-											pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx,
+											pcPlus4Ex, instructionEx, extendedImmEx, busAEx, busBEx, rWEx,
 											aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx);
   
     // EX STAGE
@@ -156,24 +168,24 @@ module pipeline_datapath(
     
     dmem DATA_MEM(aluResultMem, unshiftedMemDataUnsigned, busBMem2, memWr, dataSize, clk);
     
-    always @(unshiftedMemDataUnsigned) begin
+    always @(unshiftedMemDataUnsigned, dataSize) begin
   	    case (dataSize)
   	        2'b11: begin
-  	            memDataSigned <= unshiftedMemDataUnsigned;
-  	            memDataUnsigned <= unshiftedMemDataUnsigned;
+  	            memDataSigned = unshiftedMemDataUnsigned;
+  	            memDataUnsigned = unshiftedMemDataUnsigned;
   	        end
   	        2'b01: begin
-  	      	    memDataSigned[31:16] <= {16{unshiftedMemDataUnsigned[31]}};
-  	      	    memDataSigned[15:0] <= unshiftedMemDataUnsigned[31:16];
-  	      	    memDataUnsigned[31:16] <= 16'b0000000000000000;
-  	      	    memDataUnsigned[15:0] <= unshiftedMemDataUnsigned[31:16];
+  	      	    memDataSigned[31:16] = {16{unshiftedMemDataUnsigned[31]}};
+  	      	    memDataSigned[15:0] = unshiftedMemDataUnsigned[31:16];
+  	      	    memDataUnsigned[31:16] = 16'b0000000000000000;
+  	      	    memDataUnsigned[15:0] = unshiftedMemDataUnsigned[31:16];
   	      	    
   	      	end
   	      	2'b00: begin
-  	      	    memDataSigned[31:8] <= {24{unshiftedMemDataUnsigned[31]}};
-  	      	    memDataSigned[7:0] <= unshiftedMemDataUnsigned[31:24];
-  	      	    memDataUnsigned[31:8] <= 24'b000000000000000000000000;
-  	      	    memDataUnsigned[7:0] <= unshiftedMemDataUnsigned[31:24];
+  	      	    memDataSigned[31:8] = {24{unshiftedMemDataUnsigned[31]}};
+  	      	    memDataSigned[7:0] = unshiftedMemDataUnsigned[31:24];
+  	      	    memDataUnsigned[31:8] = 24'b000000000000000000000000;
+  	      	    memDataUnsigned[7:0] = unshiftedMemDataUnsigned[31:24];
   	      	end
   	      	default: begin
   	      	end
@@ -198,7 +210,7 @@ module pipeline_datapath(
   	
   	always @(posedge endProgram) begin
   	    $writememh("results.hex", DATA_MEM.mem);
-  	    $finish;
+  	    //$finish;
   	end
 endmodule
     

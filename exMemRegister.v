@@ -3,7 +3,7 @@ module exMemRegister(clk, write, aluResult, busBEx, rWEx, memCtrl, wrCtrlEx, alu
 
   input clk, write;  
   input [31:0] aluResult, busBEx;
-  input [4:0] rWEx, memCtrlEx; 
+  input [4:0] rWEx, memCtrl; 
   input [1:0] wrCtrlEx;
   output reg [4:0] rWMem, memCtrlMem;
   output reg [31:0] aluResultMem, busBMem;  
@@ -13,7 +13,7 @@ module exMemRegister(clk, write, aluResult, busBEx, rWEx, memCtrl, wrCtrlEx, alu
 				if(write == 1)
 				begin	
 					rWMem = rWEx;
-					memCtrlMem = memCtrlEx;
+					memCtrlMem = memCtrl;
 					aluResultMem = aluResult;
 					busBMem = busBEx;
 					wrCtrlMem = wrCtrlEx;

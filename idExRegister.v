@@ -1,15 +1,15 @@
 
-module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl, exCtrl, memCtrl, wrCtrl, pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx);
+module idExRegister(clk, write, pcPlus4Id, instructionId, extendedImm, busA, busB, rW, aluCtrl, exCtrl, memCtrl, wrCtrl, pcPlus4Ex, instructionEx, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx);
 
   input clk, write;  
-  input [31:0] pcPlus4Id, extendedImm, busA, busB;
+  input [31:0] pcPlus4Id, extendedImm, busA, busB, instructionId;
   input [4:0] rW;
   input [5:0] aluCtrl;
   input [6:0] exCtrl;
   input [4:0] memCtrl;
   input [1:0] wrCtrl;
   output reg [4:0] rWEx;
-  output reg [31:0] pcPlus4IdEx, extendedImmEx, busAEx, busBEx;
+  output reg [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx, instructionEx;
   output reg [5:0] aluCtrlEx;
   output reg [6:0] exCtrlEx;
   output reg [4:0] memCtrlEx;
@@ -20,6 +20,7 @@ module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl,
 				begin	
 					rWEx = rW;
 					pcPlus4Ex = pcPlus4Id;
+					instructionEx = instructionId;
 					extendedImmEx = extendedImm;
 					busAEx = busA;
 					busBEx = busB;
@@ -32,7 +33,8 @@ module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl,
 				else
 				begin
 					rWEx = rWEx;
-					pcPlus4Ex = pcPlus4IdEx;
+					pcPlus4Ex = pcPlus4Ex;
+					instructionEx = instructionEx;
 					extendedImmEx = extendedImmEx;
 					busAEx = busAEx;
 					busBEx = busBEx;
