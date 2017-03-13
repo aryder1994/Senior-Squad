@@ -2,6 +2,7 @@
 module ifIdRegister(clk, ifIdWr, pcPlus4, instruction, pcPlus4Id, instructionId);
   input clk, regWr;
   input [31:0] pcPlus4, instruction; 
+  output reg ifIdWr;
   output[31:0] pcPlus4Id, instructionId;
   reg   [31:0] pcPlus4Id, instructionId;  
   		
