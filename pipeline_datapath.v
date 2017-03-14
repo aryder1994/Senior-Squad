@@ -15,7 +15,7 @@ module pipeline_datapath(
 		extendedImmOut,
 		registerS1Out,
 		pcPlus4IdOut,
-		instructionIdFinal,
+		instructionId,
 		rWOut);
 		
 		input           clk;
@@ -36,7 +36,7 @@ module pipeline_datapath(
     output   [31:0] extendedImmOut;
     output   [31:0] registerS1Out;
     output   [31:0] pcPlus4IdOut;
-    output   [31:0] instructionIdFinal;
+    output   [31:0] instructionId;
     output    [4:0] rWOut;
     
     wire     [31:0] preBusA, busA, preBusB, busB, busW, preAluA, preAluA2, aluA;
@@ -48,7 +48,7 @@ module pipeline_datapath(
     wire     [31:0] shiftValue, extendedImm, immHigh, finalImm;
     wire            regDst, exMemIdA, exMemIdB, linkId;
     wire     [31:0] instruction;
-    wire     [31:0] pcPlus4Id, instructionId, instructionEx;
+    wire     [31:0] pcPlus4Id;
     wire     [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
     wire      [4:0] rWEx, rWMem, rWWb;
     wire      [5:0] aluCtrlEx;
@@ -87,8 +87,6 @@ module pipeline_datapath(
 		assign linkId = idCtrl[3];
 		
 		dff STALLER(clk, stall, prevStall);
-		
-		mux_32 INSTRMUX(0, instructionId, instructionEx, instructionIdFinal);
     
     SignExtender EXTENDER(imm16, extendedImm);
     
@@ -108,9 +106,9 @@ module pipeline_datapath(
     assign zFlag = ~preNZFlag;
     assign nzFlag = preNZFlag;
     
-    idExRegister IDEX(clk, 1'b1, pcPlus4Id, instructionIdFinal, extendedImm, busA, busB, rW,
+    idExRegister IDEX(clk, 1'b1, pcPlus4Id, extendedImm, busA, busB, rW,
     									aluCtrl, exCtrl, memCtrl, wrCtrl,
-											pcPlus4Ex, instructionEx, extendedImmEx, busAEx, busBEx, rWEx,
+											pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx,
 											aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx);
   
     // EX STAGE
@@ -203,10 +201,6 @@ module pipeline_datapath(
   	assign regWr = wrCtrlWb[1];
     
     mux_32 WR_MUX(wSrc, aluResultWb, memDataWb, busW);  
-  	
-  	initial begin
-  	    $readmemh("data.hex", DATA_MEM.mem);
-  	end
   	
   	always @(posedge endProgram) begin
   	    $writememh("results.hex", DATA_MEM.mem);

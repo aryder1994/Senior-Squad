@@ -57,10 +57,6 @@ module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, B
     
     mux_32 NEXT_INSTRUCTION(jump, preNextAddressB, preNextAddressC, nextAddress);
     
-    initial begin
-        $readmemh("instr.hex", INST_MEMORY.mem);
-    end
-    
     always @(instruction) begin
         if (instruction[11:0] == 12'b001100000000) begin
             endProgram <= 1'b1;

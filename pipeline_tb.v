@@ -22,15 +22,13 @@ module pipeline_tb;
 		//if pcSelector == 1, set startAddress, wait clock cycle, pcSelector = 0
 		
 initial
-begin
+begin		
+		$readmemh("data.hex", pipeline_0.DATAPATH_UNIT.DATA_MEM.mem);
+		$readmemh("instr.hex", pipeline_0.FETCH_UNIT.INST_MEMORY.mem);
 
-		startAddress = 32'b00000000000000000001000000000000;
+		startAddress = 32'b00000000000000000000000000000000;
 				
 		#16 pcSelector = 0;
-		
-		
-		
-			
 		
 end
 endmodule		
