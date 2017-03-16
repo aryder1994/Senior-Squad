@@ -1,19 +1,17 @@
 
-module exMemRegister(clk, write, aluResult, busBEx, rWEx, memCtrl, wrCtrlEx, fp_busWEx, fp_rWEx, fp_regWrEx,
-aluResultMem, busBMem, rWMem, memCtrlMem, wrCtrlMem, fp_busWMem, fp_rWMem, fp_regWrMem);
+module exMemRegister(clk, write, aluResult, busBEx, rWEx, memCtrl, wrCtrlEx, fp_busWEx, fp_regWrEx,
+aluResultMem, busBMem, rWMem, memCtrlMem, wrCtrlMem, fp_busWMem, fp_regWrMem);
 
   input clk, write;  
   input [31:0] aluResult, busBEx;
   input [4:0] rWEx, memCtrl; 
   input [1:0] wrCtrlEx;
   input [63:0] fp_busWEx;
-  input [4:0] fp_rWEx;
   input       fp_regWrEx;
   output reg [4:0] rWMem, memCtrlMem;
   output reg [31:0] aluResultMem, busBMem;  
   output reg [1:0] wrCtrlMem;
   output reg [63:0] fp_busWMem;
-  output reg [4:0] fp_rWMem;
   output reg       fp_regWrMem;
   		
 		  always@(posedge clk) begin		
@@ -25,7 +23,6 @@ aluResultMem, busBMem, rWMem, memCtrlMem, wrCtrlMem, fp_busWMem, fp_rWMem, fp_re
 					busBMem = busBEx;
 					wrCtrlMem = wrCtrlEx;
 					fp_busWMem = fp_busWEx;
-					fp_rWMem = fp_rWEx;
 					fp_regWrMem = fp_regWrEx;
 				end
 
@@ -37,7 +34,6 @@ aluResultMem, busBMem, rWMem, memCtrlMem, wrCtrlMem, fp_busWMem, fp_rWMem, fp_re
 					busBMem = busBMem;
 					wrCtrlMem = wrCtrlMem;
 					fp_busWMem = fp_busWMem;
-					fp_rWMem = fp_rWMem;
 					fp_regWrMem = fp_regWrMem;
 				end
 			end

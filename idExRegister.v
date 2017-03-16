@@ -1,6 +1,6 @@
 
-module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl, exCtrl, memCtrl, wrCtrl, fp_busA, fp_busB, fp_exCtrl, fp_rW, fp_regWrId,
-pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx, fp_busAEx, fp_busBEx, fp_exCtrlEx, fp_rWEx, fp_regWrEx);
+module idExRegister(clk, write, pcPlus4Id, extendedImm, busA, busB, rW, aluCtrl, exCtrl, memCtrl, wrCtrl, fp_busA, fp_busB, fp_exCtrl, fp_regWrId,
+pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx, fp_busAEx, fp_busBEx, fp_exCtrlEx, fp_regWrEx);
 
   input clk, write;  
   input [31:0] pcPlus4Id, extendedImm, busA, busB;
@@ -11,7 +11,6 @@ pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, 
   input [1:0] wrCtrl;
   input [63:0] fp_busA, fp_busB;
   input [6:0] fp_exCtrl;
-  input [4:0] fp_rW;
   input       fp_regWrId;
   output reg [4:0] rWEx;
   output reg [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
@@ -21,7 +20,6 @@ pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, 
   output reg [1:0] wrCtrlEx;
   output reg [63:0] fp_busAEx, fp_busBEx;
   output reg [6:0] fp_exCtrlEx;
-  output reg [4:0] fp_rWEx;
   output reg       fp_regWrEx;
   		
 		  always@(posedge clk) begin		
@@ -39,7 +37,6 @@ pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, 
                fp_busAEx = fp_busA;
                fp_busBEx = fp_busB;	
                fp_exCtrlEx = fp_exCtrl;
-               fp_rWEx = fp_rW;
                fp_regWrEx = fp_regWrId;
 				end
 
@@ -57,7 +54,6 @@ pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, 
                fp_busAEx = fp_busAEx;
                fp_busBEx = fp_busBEx;
                fp_exCtrlEx = fp_exCtrlEx;
-               fp_rWEx = fp_rWEx;
                fp_regWrEx = fp_regWrEx;
 				end
 			end

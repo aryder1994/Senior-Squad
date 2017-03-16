@@ -12,7 +12,7 @@ module pipeline_datapath(
 		branch,
 		stall,
 		unshiftedMemDataUnsigned,
-		fp_rW, fp_exCtrl, fp_regWrId,
+		fp_exCtrl, fp_regWrId,
 		zFlag, nzFlag,
 		extendedImmOut,
 		registerS1Out,
@@ -40,7 +40,6 @@ module pipeline_datapath(
 		input           branch;
 		input           stall;
 		input	   [31:0]	unshiftedMemDataUnsigned;
-		input     [4:0] fp_rW;
 		input     [6:0] fp_exCtrl;
 		input           fp_regWrId;
     output          zFlag, nzFlag;
@@ -81,7 +80,6 @@ module pipeline_datapath(
     wire     [63:0] fp_busA, fp_busAEx, fp_busAEx2, fp_busAEx3, fp_busB, fp_busBEx, fp_busBEx2, fp_busBEx3;
     wire     [63:0] fp_busW, fp_busWEx, fp_busWMem;
     wire     [63:0] fp_product, fp_uproduct, fp_productFinal, fp_int;
-    wire      [4:0] fp_rWEx, fp_rWMem, fp_rWWb;
     wire      [6:0] fp_exCtrlEx;
     wire            fp_regWrEx, fp_regWrMem, fp_regWr;
     wire            mulSelect, iToFp, fpToI, fp_exMemExA, fp_exMemExB, fp_memWbExA, fp_memWbExB;
@@ -113,7 +111,7 @@ module pipeline_datapath(
     SignExtender EXTENDER(imm16, extendedImm);
     
     register_file REGISTERS(~clk, reset, regWr, rS1, rS2, rWWb, busW, preBusA, preBusB);
-    fp_register_file FPREGISTERS(~clk, reset, fp_regWr, rS1, fS2, fp_rWWb, fp_busW, fp_busA, fp_busB);
+    fp_register_file FPREGISTERS(~clk, reset, fp_regWr, rS1, rS2, rWWb, fp_busW, fp_busA, fp_busB);
     
     mux_32 EXMEMIDA(exMemIdA, preBusA, aluResultMem, busA);
     mux_32 EXMEMIDB(exMemIdB, preBusB, aluResultMem, busB);
@@ -131,10 +129,10 @@ module pipeline_datapath(
     
     idExRegister IDEX(clk, 1'b1, pcPlus4Id, extendedImm, busA, busB, rW,
     									aluCtrl, exCtrl, memCtrl, wrCtrl,
-                           fp_busA, fp_busB, fp_exCtrl, fp_rW, fp_regWrId,
+                           fp_busA, fp_busB, fp_exCtrl, fp_regWrId,
 									pcPlus4Ex, extendedImmEx, busAEx, busBEx,
 								   aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx,
-							      fp_busAEx, fp_busBEx, fp_exCtrlEx, fp_rWEx, fp_regWrEx);
+							      fp_busAEx, fp_busBEx, fp_exCtrlEx, fp_regWrEx);
   
     // EX STAGE
     
@@ -204,9 +202,9 @@ module pipeline_datapath(
     mux_32 FP2IMUX(fpToI, aluResult, fp_busAEx3[31:0], aluResultEx);
     
     exMemRegister EXMEM(clk, 1'b1, aluResultEx, preAluB2, rWEx, memCtrlEx, wrCtrlEx,
-                                   fp_busWEx, fp_rWEx, fp_regWrEx,
+                                   fp_busWEx, fp_regWrEx,
 											  aluResultMem, busBMem, rWMem, memCtrlMem, wrCtrlMem,
-											  fp_busWMem, fp_rWMem, fp_regWrMem);
+											  fp_busWMem,fp_regWrMem);
     
     // MEM STAGE
     
@@ -246,9 +244,9 @@ module pipeline_datapath(
   	mux_32 MEM_SIGNED(memSign, memDataUnsigned, memDataSigned, memData);
   	
   	memWrRegister MEMWR(clk, 1'b1, aluResultMem, memData, rWMem, wrCtrlMem,
-  	                    fp_busWMem, fp_rWMem, fp_regWrMem,
+  	                    fp_busWMem, fp_regWrMem,
   	                    aluResultWb, memDataWb, rWWb, wrCtrlWb,
-  	                    fp_busW, fp_rWWb, fp_regWr);
+  	                    fp_busW, fp_regWr);
   	
   	// WR STAGE
   	
