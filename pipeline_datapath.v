@@ -40,7 +40,7 @@ module pipeline_datapath(
 		input           branch;
 		input           stall;
 		input	   [31:0]	unshiftedMemDataUnsigned;
-		input     [2:0] fp_exCtrl;
+		input     [3:0] fp_exCtrl;
 		input           fp_regWrId;
     output          zFlag, nzFlag;
     output   [31:0] extendedImmOut;
@@ -77,10 +77,10 @@ module pipeline_datapath(
     wire            memWr, memSign, memWbMem;
     wire            wSrc, regWr;
     wire            ifIdWr, prevStall;
-    wire     [63:0] fp_busA, fp_busAEx, fp_busAEx2, fp_busAEx3, fp_busB, fp_busBEx, fp_busBEx2, fp_busBEx3;
+    wire     [63:0] fp_preBusA, fp_busA, fp_busAEx, fp_busAEx2, fp_preBusB, fp_busB, fp_busBEx, fp_busBEx2;
     wire     [63:0] fp_busW, fp_busWEx, fp_busWMem;
     wire     [63:0] fp_product, fp_uproduct, fp_productFinal, fp_int;
-    wire      [2:0] fp_exCtrlEx;
+    wire      [3:0] fp_exCtrlEx;
     wire            fp_regWrEx, fp_regWrMem, fp_regWr;
     wire            mulSelect, iToFp, fpToI, fp_exMemExA, fp_exMemExB, fp_memWbExA, fp_memWbExB;
     
@@ -111,10 +111,13 @@ module pipeline_datapath(
     SignExtender EXTENDER(imm16, extendedImm);
     
     register_file REGISTERS(~clk, reset, regWr, rS1, rS2, rWWb, busW, preBusA, preBusB);
-    fp_register_file FPREGISTERS(~clk, reset, fp_regWr, rS1, rS2, rWWb, fp_busW, fp_busA, fp_busB);
+    fp_register_file FPREGISTERS(~clk, reset, fp_regWr, rS1, rS2, rWWb, fp_busW, fp_preBusA, fp_preBusB);
     
     mux_32 EXMEMIDA(exMemIdA, preBusA, aluResultMem, busA);
     mux_32 EXMEMIDB(exMemIdB, preBusB, aluResultMem, busB);
+    
+    mux_64 FPEXMEMIDA(exMemIdA, fp_preBusA, fp_busWMem, fp_busA);
+    mux_64 FPEXMEMIDB(exMemIdB, fp_preBusB, fp_busWMem, fp_busB);
             
     mux_5 REG_DST_MUX(regDst, rS2, rD, preRW);
     
@@ -157,6 +160,7 @@ module pipeline_datapath(
     assign mulSelect = fp_exCtrlEx[0];
     assign iToFp = fp_exCtrlEx[1];
     assign fpToI = fp_exCtrlEx[2];
+    assign enableMult = fp_exCtrlEx[3];
         
     mux_32 IMM_MUX(loadHigh, extendedImmEx, immHigh, finalImm);
     
@@ -180,13 +184,10 @@ module pipeline_datapath(
     alu ALU_MODULE(aluA, aluB, alu0, alu1, alu2, alu3, alu4, alu5, aluResult);
     
     mux_64 FPEXMEMEXA(exMemExA, fp_busAEx, fp_busWMem, fp_busAEx2);
-    mux_64 FPMEMWBEXA(memWbExA, fp_busAEx2, fp_busW, fp_busAEx3);
-    
     mux_64 FPEXMEMEXB(exMemExB, fp_busBEx, fp_busWMem, fp_busBEx2);
-    mux_64 FPMEMWBEXB(memWbExB, fp_busBEx2, fp_busW, fp_busBEx3);
     
-    multiplier MULT(clk, fp_busAEx3[31:0], fp_busBEx3[31:0], fp_product);
-    umultiplier UMULT(clk, fp_busAEx3[31:0], fp_busBEx3[31:0], fp_uproduct);
+    multiplier MULT(clk, enableMult, fp_busAEx2[31:0], fp_busBEx2[31:0], fp_product);
+    umultiplier UMULT(clk, enableMult, fp_busAEx2[31:0], fp_busBEx2[31:0], fp_uproduct);
     
     mux_64 MULTMUX(mulSelect, fp_product, fp_uproduct, fp_productFinal);
     
@@ -195,7 +196,7 @@ module pipeline_datapath(
     
     mux_64 I2FPMUX(iToFp, fp_productFinal, fp_int, fp_busWEx);
     
-    mux_32 FP2IMUX(fpToI, aluResult, fp_busAEx3[31:0], aluResultEx);
+    mux_32 FP2IMUX(fpToI, aluResult, fp_busAEx2[31:0], aluResultEx);
     
     exMemRegister EXMEM(clk, 1'b1, aluResultEx, preAluB2, rWEx, memCtrlEx, wrCtrlEx,
                                    fp_busWEx, fp_regWrEx,

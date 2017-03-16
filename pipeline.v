@@ -23,7 +23,7 @@ module pipeline(clk, pcSelect, startAddress, unshiftedMemDataUnsigned, instructi
    	wire      [4:0] memCtrl;
    	wire      [1:0] wrCtrl;
    	wire            stallFinal, zFlagFinal, nzFlagFinal, BEQZFinal, BNEZFinal;
-   	wire      [2:0] fp_exCtrl;
+   	wire      [3:0] fp_exCtrl;
    	wire            fp_regWrId;
    	
    	assign ifIdWr = ~stall;

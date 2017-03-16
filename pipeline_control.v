@@ -24,12 +24,14 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	output reg [4:0] memCtrl;
 	output reg [1:0] wrCtrl;
 	output  stall;
-	output reg [2:0] fp_exCtrl;
+	output reg [3:0] fp_exCtrl;
 	output reg 		 fp_regWrId;
 	
 	wire  [4:0] prevrW, prevrW2;
 	wire        prevLoad, prevLoad2, regOut, regWrTemp, isLoadWire, stallTempWire, prevStall, ignoreFwd, prevStore, isBranch, ignoreFwd2;
-	reg        mulSelect, iToFp, fpToI;
+	reg        mulSelect, iToFp, fpToI, enableMult;
+	wire  [1:0] counter, counterNewWire;
+	reg   [1:0] counterNew;
 
 	
 	assign regWrTemp = regWr;
@@ -41,7 +43,9 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	dff previousBranch(clk, isBranch, ignoreFwd);
 	dff previousStore(clk, memWr, prevStore);
 	dff previousStore2(clk, prevStore, ignoreFwd2);
+	dff_2 counterReg(clk, counterNewWire, counter);
 	mux regWrMux (stallTemp, regWrTemp, 1'b0, regOut);
+	assign counterNewWire = counterNew;
 	assign stall = stallTemp;
 	assign stallTempWire = stallTemp;
 	assign isLoadWire = isLoad;
@@ -50,7 +54,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	assign rD = instr[15:11];
 	assign isBranch = beqz || bnez;
 	
-    always@(instr, prevrW, prevrW2, prevLoad, prevLoad2, regOut, prevStall, ignoreFwd, prevStore, ignoreFwd2, rS2, rS1, isBranch)
+    always@(instr, prevrW, prevrW2, prevLoad, prevLoad2, regOut, prevStall, ignoreFwd, prevStore, ignoreFwd2, rS2, rS1, isBranch, counter)
 
     begin
        isLoad = 0;
@@ -78,6 +82,8 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 		jump = 0;
 		value = instr[25:0];	
 		fpToI = 0;	
+		counterNew = 2'b00;
+		enableMult = 0;
 
 		if (instr[31:29] == 3'b101 || instr[31:27] == 5'b01001 || instr[31:28] == 4'b0001 || instr [31:27] == 5'b00001)
 		begin
@@ -405,22 +411,98 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 		
 		else if (instr[31:26] == 6'b000001)
 		begin
+		    
+		   if (rS1 == prevrW && ignoreFwd == 0 && rS1 != 0)
+         begin
+	         exMemExA = 1;
+
+         end
+	         
+         if (rS2 == prevrW && ignoreFwd == 0 && rS2 != 0)
+         begin
+	         exMemExB = 1;
+         end
+         
+         if (rS1 == prevrW2 && ignoreFwd2 == 0 && rS1 != 0)
+         begin
+	         exMemIdA = 1;
+         end
+	         
+         if (rS2 == prevrW2 && ignoreFwd2 == 0 && rS2 != 0)
+         begin
+	         exMemIdB = 1;
+         end
+         
+         enableMult = 1;
+         
 			case (instr[5:0])
 				6'b001110:
 				begin
+				   case (counter[1:0])
+				       2'b00:
+				       begin
+				           counterNew = 2'b01;
+				           stallTemp = 1;
+				       end
+				       
+				       2'b01:
+				       begin
+				           counterNew = 2'b10;
+				           stallTemp = 1;
+				       end
+				       
+				       2'b10:
+				       begin
+				           counterNew = 2'b11;
+				           stallTemp = 1;
+				       end
+				     
+				       2'b11:
+				       begin
+				           counterNew = 2'b00;
+				           stallTemp = 0;
+				           fp_regWrId = 1;
+				       end
+				   endcase
+				   
 					regWr = 0;
 					mulSelect = 0;
-					iToFp = 0;
-					fp_regWrId = 1;					
+					iToFp = 0;				
 				end
 				
 				
 				6'b010110:
 				begin
-					regWr = 0;
-					mulSelect = 1;
-					iToFp = 0;
-					fp_regWrId = 1;			
+					case (counter[1:0])
+                   2'b00:
+                   begin
+                       counterNew = 2'b01;
+                       stallTemp = 1;
+                   end
+                   
+                   2'b01:
+                   begin
+                       counterNew = 2'b10;
+                       stallTemp = 1;
+                   end
+                   
+                   2'b10:
+                   begin
+                       counterNew = 2'b11;
+                       stallTemp = 1;
+                   end
+                 
+                   2'b11:
+                   begin
+                       counterNew = 2'b00;
+                       stallTemp = 0;
+                       fp_regWrId = 1;
+                   end
+               endcase
+               
+               regWr = 0;
+               mulSelect = 1;
+               iToFp = 0;				
 				end
 			endcase
 		end
@@ -628,6 +710,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	  fp_exCtrl[0] = mulSelect;
 	  fp_exCtrl[1] = iToFp;
 	  fp_exCtrl[2] = fpToI;
+	  fp_exCtrl[3] = enableMult;
 	
       
     end

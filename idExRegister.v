@@ -10,7 +10,7 @@ pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, 
   input [4:0] memCtrl;
   input [1:0] wrCtrl;
   input [63:0] fp_busA, fp_busB;
-  input [2:0] fp_exCtrl;
+  input [3:0] fp_exCtrl;
   input       fp_regWrId;
   output reg [4:0] rWEx;
   output reg [31:0] pcPlus4Ex, extendedImmEx, busAEx, busBEx;
@@ -19,7 +19,7 @@ pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx, aluCtrlEx, exCtrlEx, memCtrlEx, 
   output reg [4:0] memCtrlEx;
   output reg [1:0] wrCtrlEx;
   output reg [63:0] fp_busAEx, fp_busBEx;
-  output reg [2:0] fp_exCtrlEx;
+  output reg [3:0] fp_exCtrlEx;
   output reg       fp_regWrEx;
   		
 		  always@(posedge clk) begin		
