@@ -40,7 +40,7 @@ module pipeline_datapath(
 		input           branch;
 		input           stall;
 		input	   [31:0]	unshiftedMemDataUnsigned;
-		input     [6:0] fp_exCtrl;
+		input     [2:0] fp_exCtrl;
 		input           fp_regWrId;
     output          zFlag, nzFlag;
     output   [31:0] extendedImmOut;
@@ -157,10 +157,6 @@ module pipeline_datapath(
     assign mulSelect = fp_exCtrlEx[0];
     assign iToFp = fp_exCtrlEx[1];
     assign fpToI = fp_exCtrlEx[2];
-    assign fp_exMemExA = fp_exCtrlEx[3];
-    assign fp_memWbExA = fp_exCtrlEx[4];
-    assign fp_exMemExB = fp_exCtrlEx[5];
-    assign fp_memWbExB = fp_exCtrlEx[6];
         
     mux_32 IMM_MUX(loadHigh, extendedImmEx, immHigh, finalImm);
     
@@ -183,18 +179,18 @@ module pipeline_datapath(
         
     alu ALU_MODULE(aluA, aluB, alu0, alu1, alu2, alu3, alu4, alu5, aluResult);
     
-    mux_64 FPEXMEMEXA(fp_exMemExA, fp_busAEx, fp_busWMem, fp_busAEx2);
-    mux_64 FPMEMWBEXA(fp_memWbExA, fp_busAEx2, fp_busW, fp_busAEx3);
+    mux_64 FPEXMEMEXA(exMemExA, fp_busAEx, fp_busWMem, fp_busAEx2);
+    mux_64 FPMEMWBEXA(memWbExA, fp_busAEx2, fp_busW, fp_busAEx3);
     
-    mux_64 FPEXMEMEXB(fp_exMemExB, fp_busBEx, fp_busWMem, fp_busBEx2);
-    mux_64 FPMEMWBEXB(fp_memWbExB, fp_busBEx2, fp_busW, fp_busBEx3);
+    mux_64 FPEXMEMEXB(exMemExB, fp_busBEx, fp_busWMem, fp_busBEx2);
+    mux_64 FPMEMWBEXB(memWbExB, fp_busBEx2, fp_busW, fp_busBEx3);
     
     multiplier MULT(clk, fp_busAEx3[31:0], fp_busBEx3[31:0], fp_product);
     umultiplier UMULT(clk, fp_busAEx3[31:0], fp_busBEx3[31:0], fp_uproduct);
     
     mux_64 MULTMUX(mulSelect, fp_product, fp_uproduct, fp_productFinal);
     
-    assign fp_int[31:0] = aluResultWb;
+    assign fp_int[31:0] = aluResult;
     assign fp_int[63:32] = zeros;
     
     mux_64 I2FPMUX(iToFp, fp_productFinal, fp_int, fp_busWEx);
