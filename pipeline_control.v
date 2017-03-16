@@ -26,7 +26,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	output  stall;
 	
 	wire  [4:0] prevrW, prevrW2;
-	wire        prevLoad, prevLoad2, regOut, regWrTemp, isLoadWire, stallTempWire, prevStall, ignoreFwd, prevStore;
+	wire        prevLoad, prevLoad2, regOut, regWrTemp, isLoadWire, stallTempWire, prevStall, ignoreFwd, prevStore, isBranch, ignoreFwd2;
 	
 	assign regWrTemp = regWr;
 	dff_5 previousRW(clk, rW, prevrW);
@@ -37,7 +37,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	dff previousBranch(clk, isBranch, ignoreFwd);
 	dff previousStore(clk, memWr, prevStore);
 	dff previousStore2(clk, prevStore, ignoreFwd2);
-	mux regWrMux (stallTemp, regWrTemp, 0, regOut);
+	mux regWrMux (stallTemp, regWrTemp, 1'b0, regOut);
 	assign stall = stallTemp;
 	assign stallTempWire = stallTemp;
 	assign isLoadWire = isLoad;
@@ -46,7 +46,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	assign rD = instr[15:11];
 	assign isBranch = beqz || bnez;
 	
-    always@(instr, prevrW, prevrW2, prevLoad, prevLoad2, regOut, prevStall, ignoreFwd, prevStore, ignoreFwd2)
+    always@(instr, prevrW, prevrW2, prevLoad, prevLoad2, regOut, prevStall, ignoreFwd, prevStore, ignoreFwd2, rS2, rS1, isBranch)
 
     begin
        isLoad = 0;

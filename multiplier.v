@@ -2,7 +2,6 @@
 
 module multiplier(clk, in1, in2, out);
     input           clk;
-    input           reset;
     input    [31:0] in1;
     input    [31:0] in2;
     output   [63:0] out;

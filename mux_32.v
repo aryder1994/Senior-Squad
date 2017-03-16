@@ -9,7 +9,7 @@ module mux_32(sel, in0, in1, out);
     genvar i;
     generate
     for (i=0; i<32; i=i+1)
-    begin
+    begin: gen_loop
         mux MUX_N(sel, in0[i], in1[i], out[i]);
     end
     endgenerate

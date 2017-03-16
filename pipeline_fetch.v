@@ -1,6 +1,6 @@
 // Single Cycle Fetch Unit
 
-module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4Out, branchOut, endProgram);
+module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, BNEZ, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4Out, branchOut, endProgram, currentAddress);
     input           clk;
     input           pcSelect;
     input    [31:0] startAddress;
@@ -15,10 +15,11 @@ module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, B
     input    [31:0] extendedImm;
     input    [31:0] registerS1;
     input    [31:0] pcPlus4Id;
-    output   [31:0] instruction;
+    input    [31:0] instruction;
     output   [31:0] pcPlus4Out;
     output          branchOut;
     output          endProgram;
+    output   [31:0] currentAddress;
     reg             endProgram;
     
     wire     [31:0] currentAddress, preCurrentAddress, preNextAddressA, preNextAddressB, preNextAddressC, nextAddress;
@@ -29,7 +30,7 @@ module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, B
     
     assign four = 32'b00000000000000000000000000000100;
     
-    imem INST_MEMORY(currentAddress, instruction);
+    //imem INST_MEMORY(currentAddress, instruction);
     
     mux_32 START(pcSelect, preCurrentAddress, startAddress, currentAddress);
     
