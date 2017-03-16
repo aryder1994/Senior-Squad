@@ -1,5 +1,5 @@
 
-module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, beqz, bnez, jump, jumpReg, value, stall);
+module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, beqz, bnez, jump, jumpReg, value, stall, fp_exCtrl, fp_regWrId);
 
     input [31:0] instr;
 	input [4:0] rW;
@@ -24,9 +24,13 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	output reg [4:0] memCtrl;
 	output reg [1:0] wrCtrl;
 	output  stall;
+	output reg [2:0] fp_exCtrl;
+	output reg 		 fp_regWrId;
 	
 	wire  [4:0] prevrW, prevrW2;
 	wire        prevLoad, prevLoad2, regOut, regWrTemp, isLoadWire, stallTempWire, prevStall, ignoreFwd, prevStore, isBranch, ignoreFwd2;
+	wire            mulSelect, iToFp, fpToI;
+
 	
 	assign regWrTemp = regWr;
 	dff_5 previousRW(clk, rW, prevrW);
@@ -379,8 +383,46 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 					alu2 = 1;
 					alu5 = 0;
 				end
+				
+				6'110101:					// MOVI2FP
+				begin
+					alu4 = 0;
+					alu5 = 1;
+					iToFp = 1;
+					fp_regWrId = 1;
+					regWr = 0;
+				end
+				
+				6'110100:					// MOVFP2I
+				begin
+					regWr = 1;
+					fpToI = 1;
+				end
+					
 			endcase
 		end
+		
+		else if (instr[31:26] == 6'b000001)
+		begin
+			case (instr[5:0])
+				6'b001110:
+				begin
+					regWr = 0;
+					mulSelect = 0;
+					iToFp = 0;
+					fp_regWrId = 1;					
+				end
+				
+				
+				6'b010110:
+				begin
+					regWr = 0;
+					mulSelect = 1;
+					iToFp = 0;
+					fp_regWrId = 1;			
+				end
+			
+		
 		
 		else                                // I-type instructions   		   
 		begin
@@ -579,6 +621,11 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
       
       wrCtrl[0] = wSrc;
       wrCtrl[1] = regOut;
+	  
+	  fp_exCtrl[0] = mulSelect;
+	  fp_exCtrl[1] = iToFp;
+	  fp_exCtrl[2] = fpToI;
+	
       
     end
 endmodule
