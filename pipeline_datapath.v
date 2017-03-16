@@ -82,7 +82,7 @@ module pipeline_datapath(
     wire     [63:0] fp_product, fp_uproduct, fp_productFinal, fp_int;
     wire      [3:0] fp_exCtrlEx;
     wire            fp_regWrEx, fp_regWrMem, fp_regWr;
-    wire            mulSelect, iToFp, fpToI, fp_exMemExA, fp_exMemExB, fp_memWbExA, fp_memWbExB;
+    wire            mulSelect, iToFp, fpToI, enableMult;
     
     assign zeros = 32'b00000000000000000000000000000000;
     

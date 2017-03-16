@@ -25,7 +25,7 @@ module pipeline_fetch(clk, pcSelect, startAddress, stall, zFlag, nzFlag, BEQZ, B
     wire     [31:0] currentAddress, preCurrentAddress, preNextAddressA, preNextAddressB, preNextAddressC, nextAddress;
     wire     [31:0] four;
     wire     [31:0] pcPlus4, sumB, extendedValue, jumpValue;
-    wire            cout, overflow;
+    wire            cout, overflow, branch;
     wire     [31:0] shiftedImm;
     
     assign four = 32'b00000000000000000000000000000100;

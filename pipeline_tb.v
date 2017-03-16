@@ -28,7 +28,7 @@ begin
 		$readmemh("data.hex", DATA_MEM.mem);
 		$readmemh("instr.hex", INST_MEMORY.mem);
 
-		startAddress = 32'b00000000000000000000000000000000;
+		startAddress = 32'b00000000000000000001000000000000;
 				
 		#16 pcSelector = 0;
 		

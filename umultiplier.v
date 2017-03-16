@@ -40,7 +40,7 @@ module umultiplier(clk, start, in1, in2, out);
 	  genvar i;
 		generate
 		for (i = 0; i < 34; i=i+1)
-		begin
+		begin: gen_loop
 				if (i != 8 && i != 16 && i != 24 && i != 34)
 				    assign shifted_temp_out_q[i] = shifted_temp_out_d[i];
 				assign sel0[i] = shifted_temp_out_q[i][0];
