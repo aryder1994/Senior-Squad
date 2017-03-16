@@ -69,7 +69,7 @@ module pipeline_datapath(
     wire      [6:0] exCtrlEx;
     wire      [4:0] memCtrlEx, memCtrlMem;
     wire      [1:0] wrCtrlEx, wrCtrlMem, wrCtrlWb;
-    wire     [31:0] aluResultMem, busBMem, busBMem2;
+    wire     [31:0] aluResultEx, busBMem, busBMem2;
     wire     [31:0] aluResultWb, memDataWb;
     wire            alu0, alu1, alu2, alu3, alu4, alu5;
     wire            aluSrc, loadHigh, link, exMemExA, exMemExB, memWbExA, memWbExB;
@@ -80,7 +80,7 @@ module pipeline_datapath(
     wire     [63:0] fp_busA, fp_busAEx, fp_busAEx2, fp_busAEx3, fp_busB, fp_busBEx, fp_busBEx2, fp_busBEx3;
     wire     [63:0] fp_busW, fp_busWEx, fp_busWMem;
     wire     [63:0] fp_product, fp_uproduct, fp_productFinal, fp_int;
-    wire      [6:0] fp_exCtrlEx;
+    wire      [2:0] fp_exCtrlEx;
     wire            fp_regWrEx, fp_regWrMem, fp_regWr;
     wire            mulSelect, iToFp, fpToI, fp_exMemExA, fp_exMemExB, fp_memWbExA, fp_memWbExB;
     
@@ -130,7 +130,7 @@ module pipeline_datapath(
     idExRegister IDEX(clk, 1'b1, pcPlus4Id, extendedImm, busA, busB, rW,
     									aluCtrl, exCtrl, memCtrl, wrCtrl,
                            fp_busA, fp_busB, fp_exCtrl, fp_regWrId,
-									pcPlus4Ex, extendedImmEx, busAEx, busBEx,
+									pcPlus4Ex, extendedImmEx, busAEx, busBEx, rWEx,
 								   aluCtrlEx, exCtrlEx, memCtrlEx, wrCtrlEx,
 							      fp_busAEx, fp_busBEx, fp_exCtrlEx, fp_regWrEx);
   

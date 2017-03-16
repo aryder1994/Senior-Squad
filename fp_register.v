@@ -1,5 +1,5 @@
 
-module register(clk, regWr, dataIn, dataOut);
+module fp_register(clk, regWr, dataIn, dataOut);
   input clk, regWr;
   input [63:0] dataIn; 
   output[63:0] dataOut;

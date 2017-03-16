@@ -92,130 +92,130 @@ module fp_register_file(clk, reset, regWr, rS1, rS2, rW, busW, busA, busB);
     fp_register REG31(clk,regWr_31,busW,r31);
 
 
-    mux_32 MUX_a_0_0(rS1[0],r0,r1,a_0_0);
+    mux_64 MUX_a_0_0(rS1[0],r0,r1,a_0_0);
 
-    mux_32 MUX_a_0_1(rS1[0],r2,r3,a_0_1);
+    mux_64 MUX_a_0_1(rS1[0],r2,r3,a_0_1);
 
-    mux_32 MUX_a_0_2(rS1[0],r4,r5,a_0_2);
+    mux_64 MUX_a_0_2(rS1[0],r4,r5,a_0_2);
 
-    mux_32 MUX_a_0_3(rS1[0],r6,r7,a_0_3);
+    mux_64 MUX_a_0_3(rS1[0],r6,r7,a_0_3);
 
-    mux_32 MUX_a_0_4(rS1[0],r8,r9,a_0_4);
+    mux_64 MUX_a_0_4(rS1[0],r8,r9,a_0_4);
 
-    mux_32 MUX_a_0_5(rS1[0],r10,r11,a_0_5);
+    mux_64 MUX_a_0_5(rS1[0],r10,r11,a_0_5);
 
-    mux_32 MUX_a_0_6(rS1[0],r12,r13,a_0_6);
+    mux_64 MUX_a_0_6(rS1[0],r12,r13,a_0_6);
 
-    mux_32 MUX_a_0_7(rS1[0],r14,r15,a_0_7);
+    mux_64 MUX_a_0_7(rS1[0],r14,r15,a_0_7);
 
-    mux_32 MUX_a_0_8(rS1[0],r16,r17,a_0_8);
+    mux_64 MUX_a_0_8(rS1[0],r16,r17,a_0_8);
 
-    mux_32 MUX_a_0_9(rS1[0],r18,r19,a_0_9);
+    mux_64 MUX_a_0_9(rS1[0],r18,r19,a_0_9);
 
-    mux_32 MUX_a_0_10(rS1[0],r20,r21,a_0_10);
+    mux_64 MUX_a_0_10(rS1[0],r20,r21,a_0_10);
 
-    mux_32 MUX_a_0_11(rS1[0],r22,r23,a_0_11);
+    mux_64 MUX_a_0_11(rS1[0],r22,r23,a_0_11);
 
-    mux_32 MUX_a_0_12(rS1[0],r24,r25,a_0_12);
+    mux_64 MUX_a_0_12(rS1[0],r24,r25,a_0_12);
 
-    mux_32 MUX_a_0_13(rS1[0],r26,r27,a_0_13);
+    mux_64 MUX_a_0_13(rS1[0],r26,r27,a_0_13);
 
-    mux_32 MUX_a_0_14(rS1[0],r28,r29,a_0_14);
+    mux_64 MUX_a_0_14(rS1[0],r28,r29,a_0_14);
 
-    mux_32 MUX_a_0_15(rS1[0],r30,r31,a_0_15);
+    mux_64 MUX_a_0_15(rS1[0],r30,r31,a_0_15);
 
-    mux_32 MUX_a_1_0(rS1[1],a_0_0,a_0_1,a_1_0);
+    mux_64 MUX_a_1_0(rS1[1],a_0_0,a_0_1,a_1_0);
 
-    mux_32 MUX_a_1_1(rS1[1],a_0_2,a_0_3,a_1_1);
+    mux_64 MUX_a_1_1(rS1[1],a_0_2,a_0_3,a_1_1);
 
-    mux_32 MUX_a_1_2(rS1[1],a_0_4,a_0_5,a_1_2);
+    mux_64 MUX_a_1_2(rS1[1],a_0_4,a_0_5,a_1_2);
 
-    mux_32 MUX_a_1_3(rS1[1],a_0_6,a_0_7,a_1_3);
+    mux_64 MUX_a_1_3(rS1[1],a_0_6,a_0_7,a_1_3);
 
-    mux_32 MUX_a_1_4(rS1[1],a_0_8,a_0_9,a_1_4);
+    mux_64 MUX_a_1_4(rS1[1],a_0_8,a_0_9,a_1_4);
 
-    mux_32 MUX_a_1_5(rS1[1],a_0_10,a_0_11,a_1_5);
+    mux_64 MUX_a_1_5(rS1[1],a_0_10,a_0_11,a_1_5);
 
-    mux_32 MUX_a_1_6(rS1[1],a_0_12,a_0_13,a_1_6);
+    mux_64 MUX_a_1_6(rS1[1],a_0_12,a_0_13,a_1_6);
 
-    mux_32 MUX_a_1_7(rS1[1],a_0_14,a_0_15,a_1_7);
+    mux_64 MUX_a_1_7(rS1[1],a_0_14,a_0_15,a_1_7);
 
-    mux_32 MUX_a_2_0(rS1[2],a_1_0,a_1_1,a_2_0);
+    mux_64 MUX_a_2_0(rS1[2],a_1_0,a_1_1,a_2_0);
 
-    mux_32 MUX_a_2_1(rS1[2],a_1_2,a_1_3,a_2_1);
+    mux_64 MUX_a_2_1(rS1[2],a_1_2,a_1_3,a_2_1);
 
-    mux_32 MUX_a_2_2(rS1[2],a_1_4,a_1_5,a_2_2);
+    mux_64 MUX_a_2_2(rS1[2],a_1_4,a_1_5,a_2_2);
 
-    mux_32 MUX_a_2_3(rS1[2],a_1_6,a_1_7,a_2_3);
+    mux_64 MUX_a_2_3(rS1[2],a_1_6,a_1_7,a_2_3);
 
-    mux_32 MUX_a_3_0(rS1[3],a_2_0,a_2_1,a_3_0);
+    mux_64 MUX_a_3_0(rS1[3],a_2_0,a_2_1,a_3_0);
 
-    mux_32 MUX_a_3_1(rS1[3],a_2_2,a_2_3,a_3_1);
+    mux_64 MUX_a_3_1(rS1[3],a_2_2,a_2_3,a_3_1);
 
-    mux_32 MUX_a_4_0(rS1[4],a_3_0,a_3_1,busA);
+    mux_64 MUX_a_4_0(rS1[4],a_3_0,a_3_1,busA);
 
 
-    mux_32 MUX_b_0_0(rS2[0],r0,r1,b_0_0);
+    mux_64 MUX_b_0_0(rS2[0],r0,r1,b_0_0);
 
-    mux_32 MUX_b_0_1(rS2[0],r2,r3,b_0_1);
+    mux_64 MUX_b_0_1(rS2[0],r2,r3,b_0_1);
 
-    mux_32 MUX_b_0_2(rS2[0],r4,r5,b_0_2);
+    mux_64 MUX_b_0_2(rS2[0],r4,r5,b_0_2);
 
-    mux_32 MUX_b_0_3(rS2[0],r6,r7,b_0_3);
+    mux_64 MUX_b_0_3(rS2[0],r6,r7,b_0_3);
 
-    mux_32 MUX_b_0_4(rS2[0],r8,r9,b_0_4);
+    mux_64 MUX_b_0_4(rS2[0],r8,r9,b_0_4);
 
-    mux_32 MUX_b_0_5(rS2[0],r10,r11,b_0_5);
+    mux_64 MUX_b_0_5(rS2[0],r10,r11,b_0_5);
 
-    mux_32 MUX_b_0_6(rS2[0],r12,r13,b_0_6);
+    mux_64 MUX_b_0_6(rS2[0],r12,r13,b_0_6);
 
-    mux_32 MUX_b_0_7(rS2[0],r14,r15,b_0_7);
+    mux_64 MUX_b_0_7(rS2[0],r14,r15,b_0_7);
 
-    mux_32 MUX_b_0_8(rS2[0],r16,r17,b_0_8);
+    mux_64 MUX_b_0_8(rS2[0],r16,r17,b_0_8);
 
-    mux_32 MUX_b_0_9(rS2[0],r18,r19,b_0_9);
+    mux_64 MUX_b_0_9(rS2[0],r18,r19,b_0_9);
 
-    mux_32 MUX_b_0_10(rS2[0],r20,r21,b_0_10);
+    mux_64 MUX_b_0_10(rS2[0],r20,r21,b_0_10);
 
-    mux_32 MUX_b_0_11(rS2[0],r22,r23,b_0_11);
+    mux_64 MUX_b_0_11(rS2[0],r22,r23,b_0_11);
 
-    mux_32 MUX_b_0_12(rS2[0],r24,r25,b_0_12);
+    mux_64 MUX_b_0_12(rS2[0],r24,r25,b_0_12);
 
-    mux_32 MUX_b_0_13(rS2[0],r26,r27,b_0_13);
+    mux_64 MUX_b_0_13(rS2[0],r26,r27,b_0_13);
 
-    mux_32 MUX_b_0_14(rS2[0],r28,r29,b_0_14);
+    mux_64 MUX_b_0_14(rS2[0],r28,r29,b_0_14);
 
-    mux_32 MUX_b_0_15(rS2[0],r30,r31,b_0_15);
+    mux_64 MUX_b_0_15(rS2[0],r30,r31,b_0_15);
 
-    mux_32 MUX_b_1_0(rS2[1],b_0_0,b_0_1,b_1_0);
+    mux_64 MUX_b_1_0(rS2[1],b_0_0,b_0_1,b_1_0);
 
-    mux_32 MUX_b_1_1(rS2[1],b_0_2,b_0_3,b_1_1);
+    mux_64 MUX_b_1_1(rS2[1],b_0_2,b_0_3,b_1_1);
 
-    mux_32 MUX_b_1_2(rS2[1],b_0_4,b_0_5,b_1_2);
+    mux_64 MUX_b_1_2(rS2[1],b_0_4,b_0_5,b_1_2);
 
-    mux_32 MUX_b_1_3(rS2[1],b_0_6,b_0_7,b_1_3);
+    mux_64 MUX_b_1_3(rS2[1],b_0_6,b_0_7,b_1_3);
 
-    mux_32 MUX_b_1_4(rS2[1],b_0_8,b_0_9,b_1_4);
+    mux_64 MUX_b_1_4(rS2[1],b_0_8,b_0_9,b_1_4);
 
-    mux_32 MUX_b_1_5(rS2[1],b_0_10,b_0_11,b_1_5);
+    mux_64 MUX_b_1_5(rS2[1],b_0_10,b_0_11,b_1_5);
 
-    mux_32 MUX_b_1_6(rS2[1],b_0_12,b_0_13,b_1_6);
+    mux_64 MUX_b_1_6(rS2[1],b_0_12,b_0_13,b_1_6);
 
-    mux_32 MUX_b_1_7(rS2[1],b_0_14,b_0_15,b_1_7);
+    mux_64 MUX_b_1_7(rS2[1],b_0_14,b_0_15,b_1_7);
 
-    mux_32 MUX_b_2_0(rS2[2],b_1_0,b_1_1,b_2_0);
+    mux_64 MUX_b_2_0(rS2[2],b_1_0,b_1_1,b_2_0);
 
-    mux_32 MUX_b_2_1(rS2[2],b_1_2,b_1_3,b_2_1);
+    mux_64 MUX_b_2_1(rS2[2],b_1_2,b_1_3,b_2_1);
 
-    mux_32 MUX_b_2_2(rS2[2],b_1_4,b_1_5,b_2_2);
+    mux_64 MUX_b_2_2(rS2[2],b_1_4,b_1_5,b_2_2);
 
-    mux_32 MUX_b_2_3(rS2[2],b_1_6,b_1_7,b_2_3);
+    mux_64 MUX_b_2_3(rS2[2],b_1_6,b_1_7,b_2_3);
 
-    mux_32 MUX_b_3_0(rS2[3],b_2_0,b_2_1,b_3_0);
+    mux_64 MUX_b_3_0(rS2[3],b_2_0,b_2_1,b_3_0);
  
-    mux_32 MUX_b_3_1(rS2[3],b_2_2,b_2_3,b_3_1);
+    mux_64 MUX_b_3_1(rS2[3],b_2_2,b_2_3,b_3_1);
 
-    mux_32 MUX_b_4_0(rS2[4],b_3_0,b_3_1,busB);
+    mux_64 MUX_b_4_0(rS2[4],b_3_0,b_3_1,busB);
 
 
     assign regWr_32_init[31:1] = 31'b0000000000000000000000000000000;

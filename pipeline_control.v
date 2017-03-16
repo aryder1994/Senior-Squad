@@ -29,7 +29,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 	
 	wire  [4:0] prevrW, prevrW2;
 	wire        prevLoad, prevLoad2, regOut, regWrTemp, isLoadWire, stallTempWire, prevStall, ignoreFwd, prevStore, isBranch, ignoreFwd2;
-	wire            mulSelect, iToFp, fpToI;
+	reg        mulSelect, iToFp, fpToI;
 
 	
 	assign regWrTemp = regWr;
@@ -76,7 +76,8 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 		beqz = 0;
 		bnez = 0;
 		jump = 0;
-		value = instr[25:0];		
+		value = instr[25:0];	
+		fpToI = 0;	
 
 		if (instr[31:29] == 3'b101 || instr[31:27] == 5'b01001 || instr[31:28] == 4'b0001 || instr [31:27] == 5'b00001)
 		begin
@@ -384,7 +385,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 					alu5 = 0;
 				end
 				
-				6'110101:					// MOVI2FP
+				6'b110101:					// MOVI2FP
 				begin
 					alu4 = 0;
 					alu5 = 1;
@@ -393,7 +394,7 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 					regWr = 0;
 				end
 				
-				6'110100:					// MOVFP2I
+				6'b110100:					// MOVFP2I
 				begin
 					regWr = 1;
 					fpToI = 1;
@@ -421,6 +422,8 @@ module pipeline_control(clk, instr, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, ex
 					iToFp = 0;
 					fp_regWrId = 1;			
 				end
+			endcase
+		end
 			
 		
 		

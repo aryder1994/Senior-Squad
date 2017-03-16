@@ -23,6 +23,8 @@ module pipeline(clk, pcSelect, startAddress, unshiftedMemDataUnsigned, instructi
    	wire      [4:0] memCtrl;
    	wire      [1:0] wrCtrl;
    	wire            stallFinal, zFlagFinal, nzFlagFinal, BEQZFinal, BNEZFinal;
+   	wire      [2:0] fp_exCtrl;
+   	wire            fp_regWrId;
    	
    	assign ifIdWr = ~stall;
    	
@@ -34,7 +36,7 @@ module pipeline(clk, pcSelect, startAddress, unshiftedMemDataUnsigned, instructi
     
     pipeline_fetch FETCH_UNIT(clk, pcSelect, startAddress, stallFinal, zFlagFinal, nzFlagFinal, BEQZFinal, BNEZFinal, jump, jumpReg, value, extendedImm, registerS1, pcPlus4Id, instruction, pcPlus4, branch, endProgram, currentAddress);
     
-    pipeline_control CONTROL_UNIT(clk, instructionId, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, BEQZ, BNEZ, jump, jumpReg, value, stall);
+    pipeline_control CONTROL_UNIT(clk, instructionId, rW, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, BEQZ, BNEZ, jump, jumpReg, value, stall, fp_exCtrl, fp_regWrId);
     
-    pipeline_datapath DATAPATH_UNIT(clk, pcSelect, endProgram, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, ifIdWr, pcPlus4, instruction, branch, stallFinal, unshiftedMemDataUnsigned, zFlag, nzFlag, extendedImm, registerS1, pcPlus4Id, instructionId, rW, aluResultMem, busBMem2, memWr, dataSize);
+    pipeline_datapath DATAPATH_UNIT(clk, pcSelect, endProgram, rS1, rS2, rD, imm16, idCtrl, aluCtrl, exCtrl, memCtrl, wrCtrl, ifIdWr, pcPlus4, instruction, branch, stallFinal, unshiftedMemDataUnsigned, fp_exCtrl, fp_regWrId, zFlag, nzFlag, extendedImm, registerS1, pcPlus4Id, instructionId, rW, aluResultMem, busBMem2, memWr, dataSize);
 endmodule
